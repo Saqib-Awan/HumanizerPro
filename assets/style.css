@@ -1,0 +1,64 @@
+/* Custom CSS for HumanizerPro */
+.main-header {
+    text-align: center;
+    padding: 2rem 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-bottom: 2rem;
+    border-radius: 10px;
+}
+
+.feature-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    border-left: 4px solid #667eea;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin: 0.5rem;
+}
+
+.ai-score {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+.human-score {
+    background: linear-gradient(135deg, #51cf66 0%, #2f9e44 100%);
+}
+
+.improvement-positive {
+    color: #51cf66;
+    font-weight: bold;
+}
+
+.improvement-negative {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.stButton>button {
+    width: 100%;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+}
+
+.stTextArea>div>div>textarea {
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+}
+
+.stSelectbox>div>div>div {
+    border-radius: 10px;
+}
