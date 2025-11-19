@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import time
-from utils.humanizer import UltimateHumanizer as Humanizer  # CHANGED: Import UltraHumanizer
+from utils.humanizer import ProfessionalHumanizerPro as Humanizer  # CHANGED: Import UltraHumanizer
 from utils.ai_detector import AIDetector
 from utils.text_analyzer import TextAnalyzer
 
