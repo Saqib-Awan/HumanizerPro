@@ -267,9 +267,9 @@ def show_text_humanizer(humanizer, analyzer):
                     st.metric("Sentence Variety", f"{change:.1f}")
                 
                 with imp_col4:
-                    change = report['improvements']['grammar_improvement']
+                    change = report['improvements']['word_count_change']  # Changed from grammar_improvement
                     trend = "↗️" if change > 0 else "↘️"
-                    st.metric("Grammar Improvements", f"{change:+d}", delta=trend)
+                    st.metric("Word Count Change", f"{change:+d}", delta=trend)
                 
                 # Comparison charts
                 col1, col2 = st.columns(2)
