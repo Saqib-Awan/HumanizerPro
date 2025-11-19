@@ -3,267 +3,440 @@ import random
 from nltk.tokenize import sent_tokenize, word_tokenize
 from utils.text_analyzer import TextAnalyzer
 
-class UltimateHumanizer:
+class ProfessionalHumanizerPro:
     def __init__(self):
         self.analyzer = TextAnalyzer()
-        self.ai_patterns_db = self._build_ai_patterns_database()
-        self.human_signatures = self._build_human_signatures()
-        self.quality_preservers = self._build_quality_preservers()
+        self.ai_patterns = self._build_comprehensive_ai_patterns()
+        self.professional_vocabulary = self._build_professional_vocabulary()
+        self.syntactic_patterns = self._build_syntactic_patterns()
+        self.discourse_markers = self._build_discourse_markers()
         
-    def _build_ai_patterns_database(self):
+    def _build_comprehensive_ai_patterns(self):
+        """Comprehensive AI pattern database with professional alternatives"""
         return {
-            'formal_transitions': {
-                'however': ['but', 'though', 'then again', 'that said'],
-                'moreover': ['also', 'besides', 'what\'s more', 'plus'],
-                'furthermore': ['additionally', 'also', 'plus'],
-                'therefore': ['so', 'thus', 'that\'s why'],
-                'consequently': ['so', 'as a result', 'because of this'],
-                'thus': ['so', 'therefore', 'as a result'],
-                'hence': ['so', 'therefore', 'that\'s why'],
+            'transitions': {
+                'however': ['yet', 'still', 'nevertheless', 'despite this', 'even so'],
+                'moreover': ['in addition', 'what\'s more', 'further', 'beyond this'],
+                'furthermore': ['additionally', 'in addition', 'what\'s more', 'beyond that'],
+                'therefore': ['consequently', 'thus', 'as a result', 'for this reason'],
+                'consequently': ['as a result', 'accordingly', 'hence', 'for this reason'],
+                'thus': ['therefore', 'accordingly', 'hence', 'as such'],
+                'hence': ['therefore', 'accordingly', 'thus', 'as such'],
+                'indeed': ['in fact', 'actually', 'certainly', 'undoubtedly'],
+                'nonetheless': ['nevertheless', 'even so', 'yet', 'still'],
             },
             'academic_phrases': {
-                'it is important to note': ['keep in mind', 'remember that', 'note that'],
-                'it is crucial to': ['we need to', 'we must', 'it\'s vital to'],
-                'it is worth noting': ['it\'s worth remembering', 'don\'t forget'],
-                'in conclusion': ['to wrap up', 'overall', 'basically'],
-                'in summary': ['to sum up', 'basically', 'long story short'],
-                'to summarize': ['in short', 'put simply', 'basically'],
+                'it is important to note': ['it\'s worth noting', 'notably', 'significantly', 'crucially'],
+                'it is crucial to': ['it\'s essential to', 'it\'s vital that', 'critically'],
+                'it is worth noting': ['notably', 'it\'s significant that', 'importantly'],
+                'in conclusion': ['ultimately', 'in the end', 'finally', 'to conclude'],
+                'in summary': ['in brief', 'to summarize', 'overall', 'in essence'],
+                'to summarize': ['in short', 'briefly', 'in essence', 'overall'],
+                'it should be noted': ['notably', 'significantly', 'importantly'],
+                'it can be seen': ['clearly', 'evidently', 'one can observe', 'this shows'],
             },
-            'perfection_markers': {
-                'optimal': ['best', 'ideal', 'great'],
-                'utilize': ['use', 'work with', 'employ'],
-                'facilitate': ['help', 'make easier', 'assist'],
-                'implement': ['set up', 'put in place', 'start'],
-                'leverage': ['use', 'make use of', 'take advantage of'],
-                'commence': ['start', 'begin', 'get going'],
+            'formal_verbs': {
+                'utilize': ['use', 'employ', 'apply', 'implement'],
+                'facilitate': ['enable', 'support', 'assist', 'help'],
+                'implement': ['apply', 'execute', 'establish', 'deploy'],
+                'leverage': ['use', 'exploit', 'capitalize on', 'harness'],
+                'commence': ['begin', 'start', 'initiate', 'launch'],
+                'terminate': ['end', 'conclude', 'finish', 'complete'],
+                'ascertain': ['determine', 'establish', 'verify', 'confirm'],
+                'endeavor': ['attempt', 'try', 'strive', 'work'],
+            },
+            'redundant_phrases': {
+                'very unique': 'unique',
+                'completely finished': 'finished',
+                'absolutely essential': 'essential',
+                'totally complete': 'complete',
+                'extremely critical': 'critical',
+                'highly important': 'important',
             }
         }
     
-    def _build_human_signatures(self):
+    def _build_professional_vocabulary(self):
+        """Professional alternatives that maintain formality"""
         return {
-            'conversational_starters': [
-                'Well,', 'You know,', 'Actually,', 'So,', 'Look,', 
-                'Honestly,', 'I mean,', 'Basically,', 'To be honest,'
-            ],
-            'personal_elements': [
-                'I think', 'I believe', 'I feel', 'In my experience', 
-                'From what I\'ve seen', 'Personally,', 'The way I see it'
-            ],
-            'filler_phrases': [
-                'kind of', 'sort of', 'you know', 'I think', 
-                'in a way', 'more or less', 'pretty much'
-            ],
-            'contractions': {
-                'it is': 'it\'s', 'do not': 'don\'t', 'does not': 'doesn\'t',
-                'cannot': 'can\'t', 'will not': 'won\'t', 'have not': 'haven\'t',
-                'has not': 'hasn\'t', 'that is': 'that\'s', 'what is': 'what\'s',
-                'they are': 'they\'re', 'we are': 'we\'re', 'you are': 'you\'re',
-                'I am': 'I\'m', 'he is': 'he\'s', 'she is': 'she\'s'
+            'enhancers': {
+                'good': ['effective', 'valuable', 'beneficial', 'advantageous', 'productive'],
+                'bad': ['problematic', 'challenging', 'concerning', 'detrimental', 'adverse'],
+                'big': ['substantial', 'significant', 'considerable', 'extensive', 'major'],
+                'small': ['minimal', 'modest', 'limited', 'marginal', 'slight'],
+                'important': ['critical', 'essential', 'vital', 'key', 'significant'],
+                'new': ['novel', 'innovative', 'emerging', 'recent', 'contemporary'],
+                'old': ['established', 'traditional', 'conventional', 'longstanding'],
             },
-            'casual_alternatives': {
-                'utilize': 'use', 'facilitate': 'help', 'implement': 'set up',
-                'optimal': 'best', 'parameters': 'settings', 'leverage': 'use',
-                'approximately': 'about', 'subsequently': 'later', 'therefore': 'so',
-                'however': 'but', 'moreover': 'also', 'furthermore': 'plus',
+            'precision_words': {
+                'a lot of': ['numerous', 'substantial', 'considerable', 'significant'],
+                'many': ['numerous', 'multiple', 'various', 'several'],
+                'few': ['limited', 'minimal', 'scarce', 'handful of'],
+                'some': ['certain', 'particular', 'specific', 'select'],
             }
         }
-
-    def _build_quality_preservers(self):
+    
+    def _build_syntactic_patterns(self):
+        """Advanced syntactic transformation patterns"""
         return {
-            'sentence_enhancers': [
-                "What's interesting is that {sentence}",
-                "I've found that {sentence}",
-                "From my experience, {sentence}",
-                "The thing about {sentence} is that it makes sense",
-                "You'll notice that {sentence}",
+            'sentence_openers': [
+                'Notably,', 'Significantly,', 'Critically,', 'Importantly,',
+                'Interestingly,', 'Remarkably,', 'Essentially,', 'Fundamentally,'
             ],
-            'voice_changers': [
-                # Active to passive
-                (r'(\w+) (\w+)s? (\w+)', r'The \3 is \2ed by the \1'),
-                (r'We (\w+) (\w+)', r'The \2 is \1ed by us'),
-                
-                # Passive to active  
-                (r'(\w+) is (\w+)ed by (\w+)', r'The \3 \2s the \1'),
-                (r'(\w+) are (\w+)ed by (\w+)', r'The \3 \2 the \1'),
+            'transitional_phrases': [
+                'In this context,', 'From this perspective,', 'In light of this,',
+                'Building on this,', 'With this in mind,', 'Given these factors,'
+            ],
+            'hedging_devices': [
+                'appears to', 'tends to', 'seems to', 'likely', 'potentially',
+                'arguably', 'presumably', 'generally', 'typically'
+            ],
+            'emphasis_markers': [
+                'particularly', 'especially', 'notably', 'specifically',
+                'primarily', 'chiefly', 'mainly', 'predominantly'
             ]
         }
+    
+    def _build_discourse_markers(self):
+        """Discourse markers for natural flow"""
+        return {
+            'addition': ['Furthermore', 'Additionally', 'In addition', 'Moreover'],
+            'contrast': ['However', 'Conversely', 'On the other hand', 'In contrast'],
+            'cause_effect': ['Consequently', 'As a result', 'Therefore', 'Thus'],
+            'example': ['For instance', 'For example', 'Specifically', 'In particular'],
+            'clarification': ['That is', 'In other words', 'Namely', 'Specifically'],
+        }
 
-    def ultimate_humanize(self, text, intensity='extreme'):
+    def humanize_professional(self, text, maintain_formality=True):
+        """Main humanization method with professional quality preservation"""
         if not text or len(text.strip()) < 10:
             return text
         
-        original_paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-        humanized_paragraphs = []
+        # Split into paragraphs
+        paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+        processed_paragraphs = []
         
-        for paragraph in original_paragraphs:
-            humanized_paragraph = self._balanced_humanize_paragraph(paragraph)
-            humanized_paragraphs.append(humanized_paragraph)
+        for para_idx, paragraph in enumerate(paragraphs):
+            humanized = self._process_paragraph_advanced(paragraph, para_idx, maintain_formality)
+            processed_paragraphs.append(humanized)
         
-        return '\n\n'.join(humanized_paragraphs)
+        return '\n\n'.join(processed_paragraphs)
     
-    def _balanced_humanize_paragraph(self, paragraph):
+    def _process_paragraph_advanced(self, paragraph, para_index, maintain_formality):
+        """Advanced paragraph processing with context awareness"""
         sentences = sent_tokenize(paragraph)
         if not sentences:
             return paragraph
         
         transformed_sentences = []
         
-        for i, sentence in enumerate(sentences):
-            # Apply balanced transformations
-            transformed = self._balanced_sentence_transform(sentence, i)
+        for sent_idx, sentence in enumerate(sentences):
+            context = {
+                'is_first': sent_idx == 0,
+                'is_last': sent_idx == len(sentences) - 1,
+                'paragraph_position': para_index,
+                'sentence_position': sent_idx
+            }
+            
+            transformed = self._transform_sentence_professional(
+                sentence, context, maintain_formality
+            )
             transformed_sentences.append(transformed)
         
         return ' '.join(transformed_sentences)
     
-    def _balanced_sentence_transform(self, sentence, sentence_index):
+    def _transform_sentence_professional(self, sentence, context, maintain_formality):
+        """Professional sentence transformation with quality preservation"""
         if len(sentence.split()) < 4:
             return sentence
         
         original = sentence
+        working_sentence = sentence
         
-        # PHASE 1: Remove AI patterns (high probability for AI evasion)
-        sentence = self._aggressive_ai_removal(sentence)
+        # Step 1: Replace AI-typical patterns with professional alternatives
+        working_sentence = self._replace_ai_patterns(working_sentence, maintain_formality)
         
-        # PHASE 2: Add human elements (medium probability for balance)
-        sentence = self._balanced_human_injection(sentence, sentence_index)
+        # Step 2: Enhance vocabulary precision
+        working_sentence = self._enhance_vocabulary(working_sentence)
         
-        # PHASE 3: Enhance quality (maintains good writing)
-        sentence = self._quality_enhancement(sentence)
+        # Step 3: Vary sentence structure
+        working_sentence = self._vary_structure(working_sentence, context)
         
-        # PHASE 4: Change voice (adds variation for AI evasion)
-        if random.random() < 0.3:
-            sentence = self._change_voice_smart(sentence)
+        # Step 4: Add contextual discourse markers
+        working_sentence = self._add_discourse_markers(working_sentence, context)
         
-        # Final quality check
-        if self._is_quality_preserved(original, sentence):
+        # Step 5: Apply subtle linguistic variations
+        working_sentence = self._apply_linguistic_variations(working_sentence)
+        
+        # Quality validation
+        if self._validate_transformation(original, working_sentence, maintain_formality):
+            return working_sentence
+        
+        # Fallback to safer transformation
+        return self._safe_transform(original, maintain_formality)
+    
+    def _replace_ai_patterns(self, sentence, maintain_formality):
+        """Replace AI-typical patterns while maintaining professionalism"""
+        # Replace formal transitions
+        for pattern, alternatives in self.ai_patterns['transitions'].items():
+            pattern_regex = r'\b' + re.escape(pattern) + r'\b'
+            if re.search(pattern_regex, sentence, re.IGNORECASE):
+                replacement = random.choice(alternatives)
+                sentence = re.sub(pattern_regex, replacement, sentence, 
+                                flags=re.IGNORECASE, count=1)
+        
+        # Replace academic phrases
+        for phrase, alternatives in self.ai_patterns['academic_phrases'].items():
+            if phrase.lower() in sentence.lower():
+                replacement = random.choice(alternatives)
+                sentence = sentence.replace(phrase, replacement)
+                sentence = sentence.replace(phrase.capitalize(), replacement.capitalize())
+        
+        # Replace formal verbs
+        for formal, alternatives in self.ai_patterns['formal_verbs'].items():
+            pattern_regex = r'\b' + re.escape(formal) + r'\b'
+            if re.search(pattern_regex, sentence, re.IGNORECASE):
+                # Choose more professional alternatives when maintaining formality
+                replacement = random.choice(alternatives[:2] if maintain_formality else alternatives)
+                sentence = re.sub(pattern_regex, replacement, sentence, 
+                                flags=re.IGNORECASE, count=1)
+        
+        # Remove redundant phrases
+        for redundant, concise in self.ai_patterns['redundant_phrases'].items():
+            sentence = sentence.replace(redundant, concise)
+            sentence = sentence.replace(redundant.capitalize(), concise.capitalize())
+        
+        return sentence
+    
+    def _enhance_vocabulary(self, sentence):
+        """Enhance vocabulary with precise, professional alternatives"""
+        words = sentence.split()
+        
+        # Replace vague words with precise alternatives
+        for i, word in enumerate(words):
+            word_lower = word.lower().strip('.,!?;:')
+            
+            # Check enhancers
+            if word_lower in self.professional_vocabulary['enhancers']:
+                alternatives = self.professional_vocabulary['enhancers'][word_lower]
+                replacement = random.choice(alternatives)
+                # Preserve capitalization
+                if word[0].isupper():
+                    replacement = replacement.capitalize()
+                words[i] = word.replace(word_lower, replacement)
+        
+        sentence = ' '.join(words)
+        
+        # Replace imprecise phrases
+        for vague, precise_list in self.professional_vocabulary['precision_words'].items():
+            if vague in sentence.lower():
+                replacement = random.choice(precise_list)
+                sentence = re.sub(r'\b' + re.escape(vague) + r'\b', replacement, 
+                                sentence, flags=re.IGNORECASE)
+        
+        return sentence
+    
+    def _vary_structure(self, sentence, context):
+        """Vary sentence structure for natural variation"""
+        words = sentence.split()
+        
+        # Don't modify very short sentences
+        if len(words) < 6:
             return sentence
-        else:
-            # Fallback: minimal transformation that preserves quality
-            return self._minimal_safe_transform(original)
-    
-    def _aggressive_ai_removal(self, sentence):
-        """Aggressive AI pattern removal for maximum evasion"""
-        # High probability replacements for AI evasion
-        for category, patterns in self.ai_patterns_db.items():
-            for formal, alternatives in patterns.items():
-                if re.search(r'\b' + re.escape(formal) + r'\b', sentence, re.IGNORECASE):
-                    replacement = random.choice(alternatives)
-                    sentence = re.sub(r'\b' + re.escape(formal) + r'\b', replacement, sentence, re.IGNORECASE)
         
-        # Aggressive contraction application (90% probability for AI evasion)
-        for formal, contraction in self.human_signatures['contractions'].items():
-            if random.random() < 0.9:
-                sentence = re.sub(r'\b' + formal + r'\b', contraction, sentence, re.IGNORECASE)
+        # Occasionally invert sentence structure (20% probability)
+        if random.random() < 0.2 and not context['is_first']:
+            # Try to move adverbial phrases to the beginning
+            adverb_match = re.search(r',\s+(\w+ly)\s+', sentence)
+            if adverb_match:
+                adverb = adverb_match.group(1)
+                sentence = f"{adverb.capitalize()}, {sentence.replace(', ' + adverb, '')}"
         
-        return sentence
-    
-    def _balanced_human_injection(self, sentence, sentence_index):
-        """Balanced human element injection"""
-        words = sentence.split()
-        
-        # Conversational starters (40% probability - balanced)
-        if sentence_index == 0 and random.random() < 0.4:
-            starters = self.human_signatures['conversational_starters']
-            if not any(sentence.startswith(s.strip()) for s in starters):
-                starter = random.choice(starters)
-                sentence = starter + ' ' + sentence[0].lower() + sentence[1:]
-        
-        # Personal elements (30% probability - subtle but effective)
-        if random.random() < 0.3 and len(words) > 6:
-            personal = random.choice(self.human_signatures['personal_elements'])
-            insert_point = random.randint(1, min(3, len(words) - 3))
-            words.insert(insert_point, personal)
-            sentence = ' '.join(words)
-        
-        # Filler phrases (20% probability - natural human touch)
-        if random.random() < 0.2 and len(words) > 8:
-            filler = random.choice(self.human_signatures['filler_phrases'])
-            insert_point = random.randint(2, len(words) - 3)
-            words.insert(insert_point, filler)
-            sentence = ' '.join(words)
+        # Add subordinate clauses occasionally (15% probability)
+        if random.random() < 0.15 and len(words) > 8:
+            hedging = random.choice(self.syntactic_patterns['hedging_devices'])
+            # Insert hedging device before main verb
+            verb_patterns = [' is ', ' are ', ' was ', ' were ', ' has ', ' have ']
+            for verb_pattern in verb_patterns:
+                if verb_pattern in sentence:
+                    sentence = sentence.replace(verb_pattern, f' {hedging} {verb_pattern.strip()} ', 1)
+                    break
         
         return sentence
     
-    def _quality_enhancement(self, sentence):
-        """Enhance sentence quality while maintaining meaning"""
-        words = sentence.split()
-        
-        # Occasionally use sentence enhancers (25% probability)
-        if random.random() < 0.25 and len(words) > 5:
-            enhancer = random.choice(self.quality_preservers['sentence_enhancers'])
-            try:
-                enhanced = enhancer.format(sentence=sentence[0].lower() + sentence[1:])
-                if len(enhanced.split()) <= len(words) + 8:  # Don't make too long
-                    return enhanced
-            except:
-                pass
+    def _add_discourse_markers(self, sentence, context):
+        """Add contextual discourse markers for flow"""
+        # Only add to non-first sentences occasionally
+        if context['sentence_position'] > 0 and random.random() < 0.25:
+            # Don't add if sentence already starts with a marker
+            first_word = sentence.split()[0].rstrip(',')
+            if first_word not in ['However', 'Moreover', 'Furthermore', 'Therefore', 
+                                 'Thus', 'Consequently', 'Additionally', 'Indeed']:
+                marker = random.choice(self.syntactic_patterns['transitional_phrases'])
+                sentence = f"{marker} {sentence[0].lower()}{sentence[1:]}"
         
         return sentence
     
-    def _change_voice_smart(self, sentence):
-        """Smart voice changing that preserves meaning"""
-        original = sentence
+    def _apply_linguistic_variations(self, sentence):
+        """Apply subtle linguistic variations"""
+        # Add emphasis markers occasionally (20% probability)
+        if random.random() < 0.2:
+            emphasis = random.choice(self.syntactic_patterns['emphasis_markers'])
+            # Insert before key adjectives or nouns
+            words = sentence.split()
+            for i in range(1, len(words) - 1):
+                if words[i].lower() in ['important', 'critical', 'significant', 
+                                       'essential', 'key', 'relevant']:
+                    words.insert(i, emphasis)
+                    sentence = ' '.join(words)
+                    break
         
-        # Try active to passive
-        for pattern, replacement in self.quality_preservers['voice_changers']:
-            if re.search(pattern, sentence, re.IGNORECASE):
-                try:
-                    new_sentence = re.sub(pattern, replacement, sentence, re.IGNORECASE)
-                    # Check if the transformation makes sense
-                    if (self._is_meaning_preserved(original, new_sentence) and 
-                        len(new_sentence.split()) >= len(original.split()) - 2):  # Don't shorten too much
-                        return new_sentence.capitalize()
-                except:
-                    continue
+        # Vary punctuation slightly
+        sentence = self._vary_punctuation(sentence)
         
         return sentence
     
-    def _is_quality_preserved(self, original, transformed):
-        """Check if quality and meaning are preserved"""
-        if len(transformed.split()) < len(original.split()) * 0.7:  # Not too short
+    def _vary_punctuation(self, sentence):
+        """Vary punctuation for natural variation"""
+        # Replace some periods with semicolons where appropriate (10% probability)
+        if random.random() < 0.1:
+            # Look for coordinating conjunctions that could use semicolons
+            conjunctions = [' and ', ' but ', ' yet ', ' or ']
+            for conj in conjunctions:
+                if conj in sentence and sentence.count(conj) == 1:
+                    parts = sentence.split(conj)
+                    if len(parts[0].split()) > 4 and len(parts[1].split()) > 4:
+                        sentence = f"{parts[0]};{parts[1]}"
+                        break
+        
+        return sentence
+    
+    def _validate_transformation(self, original, transformed, maintain_formality):
+        """Validate that transformation maintains quality and meaning"""
+        # Length check (should be within reasonable bounds)
+        orig_len = len(original.split())
+        trans_len = len(transformed.split())
+        
+        if trans_len < orig_len * 0.75 or trans_len > orig_len * 1.4:
             return False
         
-        if len(transformed.split()) > len(original.split()) * 1.5:  # Not too long
+        # Meaning preservation check
+        if not self._check_meaning_preservation(original, transformed):
             return False
         
-        return self._is_meaning_preserved(original, transformed)
+        # Formality check
+        if maintain_formality and not self._check_formality_level(transformed):
+            return False
+        
+        return True
     
-    def _is_meaning_preserved(self, original, transformed):
-        """Check if meaning is preserved"""
-        original_words = set(original.lower().split())
-        transformed_words = set(transformed.lower().split())
+    def _check_meaning_preservation(self, original, transformed):
+        """Check if core meaning is preserved"""
+        # Extract key content words
+        orig_words = set(w.lower() for w in original.split() 
+                        if len(w) > 3 and w.isalpha())
+        trans_words = set(w.lower() for w in transformed.split() 
+                         if len(w) > 3 and w.isalpha())
         
-        common_words = original_words.intersection(transformed_words)
-        similarity = len(common_words) / max(len(original_words), len(transformed_words))
+        # Calculate overlap
+        if not orig_words:
+            return True
         
-        return similarity > 0.5  # Reasonable similarity threshold
+        overlap = len(orig_words & trans_words) / len(orig_words)
+        return overlap > 0.5
     
-    def _minimal_safe_transform(self, sentence):
-        """Apply minimal safe transformations as fallback"""
-        # Only apply contractions and basic AI pattern removal
-        for formal, contraction in self.human_signatures['contractions'].items():
-            if random.random() < 0.7:
-                sentence = re.sub(r'\b' + formal + r'\b', contraction, sentence, re.IGNORECASE)
-        
+    def _check_formality_level(self, sentence):
+        """Check if sentence maintains professional formality"""
+        informal_markers = ['gonna', 'wanna', 'gotta', 'kinda', 'sorta', 'yeah', 'nope']
+        return not any(marker in sentence.lower() for marker in informal_markers)
+    
+    def _safe_transform(self, sentence, maintain_formality):
+        """Safe fallback transformation"""
+        # Apply only the most reliable transformations
+        sentence = self._replace_ai_patterns(sentence, maintain_formality)
+        sentence = self._enhance_vocabulary(sentence)
         return sentence
     
-    def humanize_text(self, text, intensity='extreme'):
-        return self.ultimate_humanize(text, intensity)
+    def humanize_text(self, text, maintain_formality=True):
+        """Alias for main humanization method"""
+        return self.humanize_professional(text, maintain_formality)
     
     def get_humanization_report(self, original_text, humanized_text):
+        """Generate comprehensive humanization report"""
         original_analysis = self.analyzer.analyze_text(original_text)
         humanized_analysis = self.analyzer.analyze_text(humanized_text)
         
         improvements = {
-            'readability_change': humanized_analysis['flesch_reading_ease'] - original_analysis['flesch_reading_ease'],
-            'lexical_diversity_change': humanized_analysis['lexical_diversity'] - original_analysis['lexical_diversity'],
-            'sentence_variety': abs(humanized_analysis['avg_sentence_length'] - original_analysis['avg_sentence_length']),
-            'word_count_change': humanized_analysis['word_count'] - original_analysis['word_count'],
-            'grammar_improvement': original_analysis['grammar_errors'] - humanized_analysis['grammar_errors']
+            'readability_change': humanized_analysis['flesch_reading_ease'] - 
+                                original_analysis['flesch_reading_ease'],
+            'lexical_diversity_change': humanized_analysis['lexical_diversity'] - 
+                                      original_analysis['lexical_diversity'],
+            'sentence_variety': abs(humanized_analysis['avg_sentence_length'] - 
+                                  original_analysis['avg_sentence_length']),
+            'word_count_change': humanized_analysis['word_count'] - 
+                               original_analysis['word_count'],
+            'grammar_improvement': original_analysis['grammar_errors'] - 
+                                 humanized_analysis['grammar_errors'],
+            'formality_score': self._calculate_formality_score(humanized_text),
+            'ai_pattern_reduction': self._calculate_ai_pattern_reduction(
+                original_text, humanized_text
+            )
         }
         
         return {
             'original_analysis': original_analysis,
             'humanized_analysis': humanized_analysis,
-            'improvements': improvements
+            'improvements': improvements,
+            'quality_score': self._calculate_overall_quality(improvements)
         }
+    
+    def _calculate_formality_score(self, text):
+        """Calculate formality score of text"""
+        formal_indicators = ['therefore', 'however', 'moreover', 'consequently']
+        informal_indicators = ['gonna', 'wanna', 'kinda', 'yeah']
+        
+        words = text.lower().split()
+        formal_count = sum(1 for word in words if word in formal_indicators)
+        informal_count = sum(1 for word in words if word in informal_indicators)
+        
+        total_words = len(words)
+        if total_words == 0:
+            return 0.5
+        
+        return (formal_count - informal_count) / total_words + 0.5
+    
+    def _calculate_ai_pattern_reduction(self, original, humanized):
+        """Calculate reduction in AI patterns"""
+        ai_patterns = ['however', 'moreover', 'furthermore', 'therefore', 'thus',
+                      'consequently', 'it is important', 'it is crucial']
+        
+        original_count = sum(original.lower().count(pattern) for pattern in ai_patterns)
+        humanized_count = sum(humanized.lower().count(pattern) for pattern in ai_patterns)
+        
+        if original_count == 0:
+            return 0
+        
+        reduction = (original_count - humanized_count) / original_count
+        return max(0, min(1, reduction))
+    
+    def _calculate_overall_quality(self, improvements):
+        """Calculate overall quality score"""
+        scores = []
+        
+        # Readability (should not change drastically)
+        readability_impact = abs(improvements['readability_change'])
+        readability_score = max(0, 1 - (readability_impact / 20))
+        scores.append(readability_score)
+        
+        # Lexical diversity (slight increase is good)
+        diversity_score = min(1, max(0, 0.5 + improvements['lexical_diversity_change'] * 2))
+        scores.append(diversity_score)
+        
+        # AI pattern reduction (high is good)
+        scores.append(improvements.get('ai_pattern_reduction', 0.5))
+        
+        # Formality (should be maintained)
+        formality = improvements.get('formality_score', 0.5)
+        formality_score = formality if formality > 0.4 else 0.3
+        scores.append(formality_score)
+        
+        return sum(scores) / len(scores)
