@@ -2,7 +2,7 @@ import re
 import random
 import numpy as np
 from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.corpuss import stopwords
+from nltk.corpus import stopwords
 from utils.text_analyzer import TextAnalyzer
 
 class UltraHumanizer:
