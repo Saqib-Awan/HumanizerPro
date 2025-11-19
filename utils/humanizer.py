@@ -1,191 +1,269 @@
 import re
 import random
-import hashlib
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
+from utils.text_analyzer import TextAnalyzer
 
-# === ULTRA HUMANIZER PRO 2025 - UNDETECTABLE EDITION ===
-class ProfessionalHumanizerPro:
+class UltimateHumanizer:
     def __init__(self):
-        self.human_touch = self._build_ultra_human_patterns()
-
-    def _build_ultra_human_patterns(self):
+        self.analyzer = TextAnalyzer()
+        self.ai_patterns_db = self._build_ai_patterns_database()
+        self.human_signatures = self._build_human_signatures()
+        self.quality_preservers = self._build_quality_preservers()
+        
+    def _build_ai_patterns_database(self):
         return {
-            # Natural ways humans actually write professionally
-            "starters": [
-                "Look,", "Honestly,", "To be clear,", "Here's the thing,", "One thing I've noticed is",
-                "From experience,", "What usually happens is", "The reality is", "In practice,",
-                "Something that stands out is", "At the end of the day,", "When you dig into it,",
-                "Frankly,", "Truth be told,", "Interestingly enough,"
-            ],
-            "asides": [
-                " — at least that's been my experience", " — or so it seems", " — and this is important",
-                " — surprisingly", " — which isn't always obvious", " — if I'm being honest",
-                " (not everyone agrees on this)", " (and rightly so)", " — quite the opposite, actually",
-                " — which makes sense when you think about it"
-            ],
-            "emphasis": [
-                "really", "actually", "truly", "genuinely", "honestly", "quite", "pretty much",
-                "almost always", "without question", "hands down", "by far"
-            ],
-            "transitions_natural": [
-                "That said,", "Still,", "But then again,", "On the flip side,", "Having said that,",
-                "Now,", "Anyway,", "So,", "And yet,", "Even so,", "All the same,",
-                "Here's where it gets interesting:", "The key point is", "What matters most is"
-            ],
-            "contractions": {
-                "do not": "don't", "cannot": "can't", "will not": "won't", "it is": "it's",
-                "that is": "that's", "there is": "there's", "you will": "you'll", "we are": "we're",
-                "I have": "I've", "would have": "would've", "should have": "should've",
-                "it has": "it's", "let us": "let's"
+            'formal_transitions': {
+                'however': ['but', 'though', 'then again', 'that said'],
+                'moreover': ['also', 'besides', 'what\'s more', 'plus'],
+                'furthermore': ['additionally', 'also', 'plus'],
+                'therefore': ['so', 'thus', 'that\'s why'],
+                'consequently': ['so', 'as a result', 'because of this'],
+                'thus': ['so', 'therefore', 'as a result'],
+                'hence': ['so', 'therefore', 'that\'s why'],
             },
-            "micro_variations": [
-                "kind of", "sort of", "a bit", "somewhat", "pretty", "fairly", "rather",
-                "in a way", "to some extent", "more or less"
+            'academic_phrases': {
+                'it is important to note': ['keep in mind', 'remember that', 'note that'],
+                'it is crucial to': ['we need to', 'we must', 'it\'s vital to'],
+                'it is worth noting': ['it\'s worth remembering', 'don\'t forget'],
+                'in conclusion': ['to wrap up', 'overall', 'basically'],
+                'in summary': ['to sum up', 'basically', 'long story short'],
+                'to summarize': ['in short', 'put simply', 'basically'],
+            },
+            'perfection_markers': {
+                'optimal': ['best', 'ideal', 'great'],
+                'utilize': ['use', 'work with', 'employ'],
+                'facilitate': ['help', 'make easier', 'assist'],
+                'implement': ['set up', 'put in place', 'start'],
+                'leverage': ['use', 'make use of', 'take advantage of'],
+                'commence': ['start', 'begin', 'get going'],
+            }
+        }
+    
+    def _build_human_signatures(self):
+        return {
+            'conversational_starters': [
+                'Well,', 'You know,', 'Actually,', 'So,', 'Look,', 
+                'Honestly,', 'I mean,', 'Basically,', 'To be honest,'
+            ],
+            'personal_elements': [
+                'I think', 'I believe', 'I feel', 'In my experience', 
+                'From what I\'ve seen', 'Personally,', 'The way I see it'
+            ],
+            'filler_phrases': [
+                'kind of', 'sort of', 'you know', 'I think', 
+                'in a way', 'more or less', 'pretty much'
+            ],
+            'contractions': {
+                'it is': 'it\'s', 'do not': 'don\'t', 'does not': 'doesn\'t',
+                'cannot': 'can\'t', 'will not': 'won\'t', 'have not': 'haven\'t',
+                'has not': 'hasn\'t', 'that is': 'that\'s', 'what is': 'what\'s',
+                'they are': 'they\'re', 'we are': 'we\'re', 'you are': 'you\'re',
+                'I am': 'I\'m', 'he is': 'he\'s', 'she is': 'she\'s'
+            },
+            'casual_alternatives': {
+                'utilize': 'use', 'facilitate': 'help', 'implement': 'set up',
+                'optimal': 'best', 'parameters': 'settings', 'leverage': 'use',
+                'approximately': 'about', 'subsequently': 'later', 'therefore': 'so',
+                'however': 'but', 'moreover': 'also', 'furthermore': 'plus',
+            }
+        }
+
+    def _build_quality_preservers(self):
+        return {
+            'sentence_enhancers': [
+                "What's interesting is that {sentence}",
+                "I've found that {sentence}",
+                "From my experience, {sentence}",
+                "The thing about {sentence} is that it makes sense",
+                "You'll notice that {sentence}",
+            ],
+            'voice_changers': [
+                # Active to passive
+                (r'(\w+) (\w+)s? (\w+)', r'The \3 is \2ed by the \1'),
+                (r'We (\w+) (\w+)', r'The \2 is \1ed by us'),
+                
+                # Passive to active  
+                (r'(\w+) is (\w+)ed by (\w+)', r'The \3 \2s the \1'),
+                (r'(\w+) are (\w+)ed by (\w+)', r'The \3 \2 the \1'),
             ]
         }
 
-    def humanize_professional(self, text, maintain_formality=True):
-        if not text or len(text.strip()) < 20:
+    def ultimate_humanize(self, text, intensity='extreme'):
+        if not text or len(text.strip()) < 10:
             return text
-
-        # Seed randomness based on text for consistency but variation
-        seed = int(hashlib.sha256(text.encode()).hexdigest(), 16) % (2**32)
-        random.seed(seed)
-
-        paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-        result = []
-
-        for para in paragraphs:
-            sentences = sent_tokenize(para)
-            processed = []
-
-            for i, sent in enumerate(sentences):
-                if sent.strip() in ["", ".", "!", "?"]:
-                    processed.append(sent)
+        
+        original_paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+        humanized_paragraphs = []
+        
+        for paragraph in original_paragraphs:
+            humanized_paragraph = self._balanced_humanize_paragraph(paragraph)
+            humanized_paragraphs.append(humanized_paragraph)
+        
+        return '\n\n'.join(humanized_paragraphs)
+    
+    def _balanced_humanize_paragraph(self, paragraph):
+        sentences = sent_tokenize(paragraph)
+        if not sentences:
+            return paragraph
+        
+        transformed_sentences = []
+        
+        for i, sentence in enumerate(sentences):
+            # Apply balanced transformations
+            transformed = self._balanced_sentence_transform(sentence, i)
+            transformed_sentences.append(transformed)
+        
+        return ' '.join(transformed_sentences)
+    
+    def _balanced_sentence_transform(self, sentence, sentence_index):
+        if len(sentence.split()) < 4:
+            return sentence
+        
+        original = sentence
+        
+        # PHASE 1: Remove AI patterns (high probability for AI evasion)
+        sentence = self._aggressive_ai_removal(sentence)
+        
+        # PHASE 2: Add human elements (medium probability for balance)
+        sentence = self._balanced_human_injection(sentence, sentence_index)
+        
+        # PHASE 3: Enhance quality (maintains good writing)
+        sentence = self._quality_enhancement(sentence)
+        
+        # PHASE 4: Change voice (adds variation for AI evasion)
+        if random.random() < 0.3:
+            sentence = self._change_voice_smart(sentence)
+        
+        # Final quality check
+        if self._is_quality_preserved(original, sentence):
+            return sentence
+        else:
+            # Fallback: minimal transformation that preserves quality
+            return self._minimal_safe_transform(original)
+    
+    def _aggressive_ai_removal(self, sentence):
+        """Aggressive AI pattern removal for maximum evasion"""
+        # High probability replacements for AI evasion
+        for category, patterns in self.ai_patterns_db.items():
+            for formal, alternatives in patterns.items():
+                if re.search(r'\b' + re.escape(formal) + r'\b', sentence, re.IGNORECASE):
+                    replacement = random.choice(alternatives)
+                    sentence = re.sub(r'\b' + re.escape(formal) + r'\b', replacement, sentence, re.IGNORECASE)
+        
+        # Aggressive contraction application (90% probability for AI evasion)
+        for formal, contraction in self.human_signatures['contractions'].items():
+            if random.random() < 0.9:
+                sentence = re.sub(r'\b' + formal + r'\b', contraction, sentence, re.IGNORECASE)
+        
+        return sentence
+    
+    def _balanced_human_injection(self, sentence, sentence_index):
+        """Balanced human element injection"""
+        words = sentence.split()
+        
+        # Conversational starters (40% probability - balanced)
+        if sentence_index == 0 and random.random() < 0.4:
+            starters = self.human_signatures['conversational_starters']
+            if not any(sentence.startswith(s.strip()) for s in starters):
+                starter = random.choice(starters)
+                sentence = starter + ' ' + sentence[0].lower() + sentence[1:]
+        
+        # Personal elements (30% probability - subtle but effective)
+        if random.random() < 0.3 and len(words) > 6:
+            personal = random.choice(self.human_signatures['personal_elements'])
+            insert_point = random.randint(1, min(3, len(words) - 3))
+            words.insert(insert_point, personal)
+            sentence = ' '.join(words)
+        
+        # Filler phrases (20% probability - natural human touch)
+        if random.random() < 0.2 and len(words) > 8:
+            filler = random.choice(self.human_signatures['filler_phrases'])
+            insert_point = random.randint(2, len(words) - 3)
+            words.insert(insert_point, filler)
+            sentence = ' '.join(words)
+        
+        return sentence
+    
+    def _quality_enhancement(self, sentence):
+        """Enhance sentence quality while maintaining meaning"""
+        words = sentence.split()
+        
+        # Occasionally use sentence enhancers (25% probability)
+        if random.random() < 0.25 and len(words) > 5:
+            enhancer = random.choice(self.quality_preservers['sentence_enhancers'])
+            try:
+                enhanced = enhancer.format(sentence=sentence[0].lower() + sentence[1:])
+                if len(enhanced.split()) <= len(words) + 8:  # Don't make too long
+                    return enhanced
+            except:
+                pass
+        
+        return sentence
+    
+    def _change_voice_smart(self, sentence):
+        """Smart voice changing that preserves meaning"""
+        original = sentence
+        
+        # Try active to passive
+        for pattern, replacement in self.quality_preservers['voice_changers']:
+            if re.search(pattern, sentence, re.IGNORECASE):
+                try:
+                    new_sentence = re.sub(pattern, replacement, sentence, re.IGNORECASE)
+                    # Check if the transformation makes sense
+                    if (self._is_meaning_preserved(original, new_sentence) and 
+                        len(new_sentence.split()) >= len(original.split()) - 2):  # Don't shorten too much
+                        return new_sentence.capitalize()
+                except:
                     continue
-
-                ctx = {
-                    'first': i == 0,
-                    'last': i == len(sentences) - 1,
-                    'length': len(sentences)
-                }
-
-                new_sent = self._ultra_humanize_sentence(sent.strip(), ctx, maintain_formality)
-                processed.append(new_sent)
-
-            # Enforce human burstiness: mix short + long sentences aggressively
-            processed = self._enforce_burstiness(processed)
-            result.append(" ".join(processed))
-
-        final = "\n\n".join(result)
-        final = self._final_polish(final)
-        return final
-
-    def _ultra_humanize_sentence(self, sentence, ctx, formal):
-        s = sentence.strip()
-        if len(s) < 20:
-            return s
-
-        changes = 0
-
-        # 1. Add natural starter (sparingly, but enough)
-        if not ctx['first'] and random.random() < 0.35:
-            starter = random.choice(self.human_touch["starters"])
-            s = starter + " " + s[0].lower() + s[1:]
-            changes += 1
-
-        # 2. Insert subtle aside or emphasis (the #1 undetectable trick)
-        if len(s) > 70 and random.random() < 0.45:
-            aside = random.choice(self.human_touch["asides"])
-            pos = random.randint(40, min(len(s)-30, 120))
-            s = s[:pos] + aside + s[pos:]
-            changes += 1
-
-        # 3. Add emphasis words
-        if random.random() < 0.4:
-            emph = random.choice(self.human_touch["emphasis"])
-            # Insert before strong adjectives/adverbs
-            s = re.sub(r'\b(important|critical|key|significant|major|essential|vital|crucial)\b',
-                       lambda m: f"{emph} {m.group(1)}", s, count=1)
-            changes += 1
-
-        # 4. Natural transitions
-        if not ctx['first'] and random.random() < 0.3:
-            trans = random.choice(self.human_touch["transitions_natural"])
-            s = trans + " " + s[0].lower() + s[1:]
-
-        # 5. Aggressive contractions (humans use them even in pro writing)
-        for full, short in self.human_touch["contractions"].items():
-            if random.random() < 0.8:
-                s = re.sub(r'\b' + full + r'\b', short, s, flags=re.IGNORECASE)
-
-        # 6. Micro-variations (perplexity killer)
-        if random.random() < 0.35:
-            micro = random.choice(self.human_touch["micro_variations"])
-            s = re.sub(r'\b(exactly|completely|totally|absolutely)\b', micro, s, flags=re.IGNORECASE)
-
-        # 7. Occasional fragment or dash break
-        if len(s) > 100 and random.random() < 0.25:
-            parts = re.split(r', (?=and |but |which |that |this )', s, 1)
-            if len(parts) > 1:
-                s = parts[0] + " — " + parts[1].lstrip().capitalize()
-
-        return s[0].upper() + s[1:]
-
-    def _enforce_burstiness(self, sentences):
-        if len(sentences) < 3:
-            return sentences
-
-        new_sents = []
-        for s in sentences:
-            words = len(s.split())
-            if words > 28 and random.random() < 0.5:
-                # Break long sentence naturally
-                break_at = s.find('. ', s.find('. ', 50) + 1)
-                if break_at == -1:
-                    break_at = s.find(', ', 80)
-                    if break_at != -1 and break_at < len(s)-30:
-                        new_sents.append(s[:break_at+1])
-                        remainder = s[break_at+1:].strip()
-                        if remainder:
-                            new_sents.append(remainder[0].upper() + remainder[1:])
-                    else:
-                        new_sents.append(s)
-                else:
-                    new_sents.append(s[:break_at+1])
-                    remainder = s[break_at+1:].strip()
-                    if remainder:
-                        new_sents.append(remainder)
-            else:
-                new_sents.append(s)
-        return new_sents
-
-    def _final_polish(self, text):
-        text = re.sub(r'\s+', ' ', text)
-        text = re.sub(r'\.\s+([a-z])', lambda m: '. ' + m.group(1).upper(), text)
-        text = re.sub(r'\?\s+([a-z])', lambda m: '? ' + m.group(1).upper(), text)
-        text = re.sub(r'!\s+([a-z])', lambda m: '! ' + m.group(1).upper(), text)
-        text = re.sub(r'"\s+([a-z])', lambda m: '" ' + m.group(1).upper(), text)
-        return text.strip()
-
-    # === KEEP ALL ORIGINAL METHOD NAMES FOR COMPATIBILITY ===
-    def humanize_text(self, text, maintain_formality=True):
-        return self.humanize_professional(text, maintain_formality)
-
+        
+        return sentence
+    
+    def _is_quality_preserved(self, original, transformed):
+        """Check if quality and meaning are preserved"""
+        if len(transformed.split()) < len(original.split()) * 0.7:  # Not too short
+            return False
+        
+        if len(transformed.split()) > len(original.split()) * 1.5:  # Not too long
+            return False
+        
+        return self._is_meaning_preserved(original, transformed)
+    
+    def _is_meaning_preserved(self, original, transformed):
+        """Check if meaning is preserved"""
+        original_words = set(original.lower().split())
+        transformed_words = set(transformed.lower().split())
+        
+        common_words = original_words.intersection(transformed_words)
+        similarity = len(common_words) / max(len(original_words), len(transformed_words))
+        
+        return similarity > 0.5  # Reasonable similarity threshold
+    
+    def _minimal_safe_transform(self, sentence):
+        """Apply minimal safe transformations as fallback"""
+        # Only apply contractions and basic AI pattern removal
+        for formal, contraction in self.human_signatures['contractions'].items():
+            if random.random() < 0.7:
+                sentence = re.sub(r'\b' + formal + r'\b', contraction, sentence, re.IGNORECASE)
+        
+        return sentence
+    
+    def humanize_text(self, text, intensity='extreme'):
+        return self.ultimate_humanize(text, intensity)
+    
     def get_humanization_report(self, original_text, humanized_text):
-        # FIXED: No more KeyError — safe default structure
+        original_analysis = self.analyzer.analyze_text(original_text)
+        humanized_analysis = self.analyzer.analyze_text(humanized_text)
+        
+        improvements = {
+            'readability_change': humanized_analysis['flesch_reading_ease'] - original_analysis['flesch_reading_ease'],
+            'lexical_diversity_change': humanized_analysis['lexical_diversity'] - original_analysis['lexical_diversity'],
+            'sentence_variety': abs(humanized_analysis['avg_sentence_length'] - original_analysis['avg_sentence_length']),
+            'word_count_change': humanized_analysis['word_count'] - original_analysis['word_count'],
+            'grammar_improvement': original_analysis['grammar_errors'] - humanized_analysis['grammar_errors']
+        }
+        
         return {
-            'original_analysis': {'flesch_reading_ease': 50, 'lexical_diversity': 0.6, 'avg_sentence_length': 20, 'word_count': len(original_text.split()), 'grammar_errors': 0},
-            'humanized_analysis': {'flesch_reading_ease': 65, 'lexical_diversity': 0.78, 'avg_sentence_length': 18, 'word_count': len(humanized_text.split()), 'grammar_errors': 0},
-            'improvements': {
-                'readability_change': 15.0,
-                'lexical_diversity_change': 0.18,
-                'sentence_variety': 8.2,
-                'word_count_change': len(humanized_text.split()) - len(original_text.split()),
-                'grammar_improvement': 0,
-                'formality_score': 0.82,
-                'ai_pattern_reduction': 0.97
-            },
-            'quality_score': 0.98,
-            'detector_bypass_confidence': '99.9% Human (Tested Nov 2025)'
+            'original_analysis': original_analysis,
+            'humanized_analysis': humanized_analysis,
+            'improvements': improvements
         }
