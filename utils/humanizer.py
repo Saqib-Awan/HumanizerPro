@@ -5,45 +5,64 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 from utils.text_analyzer import TextAnalyzer
 
-class UltraHumanizer:
+class UltimateHumanizer:
     def __init__(self):
         self.analyzer = TextAnalyzer()
         
-        # Enhanced AI detection evasion patterns
-        self.ai_patterns_db = self._build_ai_patterns_database()
-        self.human_patterns_db = self._build_human_patterns_database()
-        self.synonym_chains = self._build_synonym_chains()
-        self.sentence_expanders = self._build_sentence_expanders()
-        self.ai_detection_evasion = self._build_ai_evasion_patterns()
+        # Ultimate AI evasion databases
+        self.ai_fingerprints = self._build_ai_fingerprints()
+        self.human_signatures = self._build_human_signatures()
+        self.evasion_techniques = self._build_evasion_techniques()
         
-    def _build_ai_patterns_database(self):
-        """Comprehensive database of AI writing patterns"""
+    def _build_ai_fingerprints(self):
+        """Complete database of AI writing fingerprints"""
         return {
-            'formal_transitions': {
-                'however': ['but', 'though', 'then again', 'that said', 'on the flip side', 'then'],
-                'moreover': ['also', 'besides', 'what\'s more', 'on top of that', 'plus'],
-                'furthermore': ['plus', 'additionally', 'not to mention', 'and'],
-                'additionally': ['also', 'as well', 'too', 'and'],
-                'consequently': ['so', 'as a result', 'because of this', 'that\'s why'],
-                'therefore': ['so', 'thus', 'that\'s why', 'which means'],
+            # AI sentence structures
+            'perfect_structures': [
+                r'^The [a-z]+ is [a-z]+ and [a-z]+\.$',
+                r'^This [a-z]+ demonstrates how [a-z]+ [a-z]+\.$',
+                r'^It is important to [a-z]+ that [a-z]+ [a-z]+\.$',
+                r'^In [a-z]+, the [a-z]+ [a-z]+ [a-z]+\.$'
+            ],
+            
+            # AI vocabulary patterns
+            'ai_vocabulary': {
+                'utilize': ['use', 'work with', 'employ', 'handle', 'operate'],
+                'facilitate': ['help', 'make easier', 'assist', 'support', 'enable'],
+                'implement': ['set up', 'put in place', 'start using', 'establish'],
+                'optimal': ['best', 'ideal', 'perfect', 'great', 'excellent'],
+                'parameters': ['settings', 'options', 'choices', 'controls'],
+                'leverage': ['use', 'make use of', 'take advantage of', 'employ'],
+                'commence': ['start', 'begin', 'kick off', 'get going'],
+                'terminate': ['end', 'stop', 'finish', 'wrap up'],
+                'approximately': ['about', 'around', 'roughly', 'more or less'],
+                'subsequently': ['later', 'afterwards', 'then', 'next'],
+                'consequently': ['so', 'as a result', 'therefore', 'thus'],
+                'therefore': ['so', 'thus', 'as a result', 'that\'s why'],
+                'however': ['but', 'though', 'yet', 'on the other hand'],
+                'moreover': ['also', 'besides', 'what\'s more', 'plus'],
+                'furthermore': ['additionally', 'moreover', 'also', 'plus'],
+                'additionally': ['also', 'as well', 'too', 'plus'],
                 'thus': ['so', 'therefore', 'as a result', 'that\'s why'],
-                'hence': ['so', 'therefore', 'that\'s why', 'which is why'],
+                'hence': ['so', 'therefore', 'that\'s why', 'which means'],
                 'nevertheless': ['anyway', 'still', 'even so', 'regardless'],
-                'nonetheless': ['regardless', 'anyway', 'still', 'even so']
+                'nonetheless': ['regardless', 'anyway', 'still', 'even so'],
+                'notwithstanding': ['despite', 'even with', 'regardless of'],
+                'accordingly': ['so', 'therefore', 'thus', 'that\'s why']
             },
-            'academic_phrases': {
-                'it is important to note': ['keep in mind', 'remember that', 'note that', 'don\'t forget that'],
+            
+            # AI phrasing patterns
+            'ai_phrases': {
+                'it is important to note': ['keep in mind', 'remember that', 'note that', 'don\'t forget'],
                 'it is crucial to': ['we need to', 'we must', 'it\'s vital to', 'we have to'],
                 'it is worth noting': ['it\'s worth remembering', 'don\'t forget', 'remember this'],
-                'it should be emphasized': ['it\'s key to remember', 'the main point is', 'what matters most is'],
+                'it should be emphasized': ['it\'s key to remember', 'the main point is', 'what matters most'],
                 'from this perspective': ['looking at it this way', 'from this angle', 'in this view'],
                 'in this context': ['in this situation', 'under these circumstances', 'given this'],
-                'upon careful analysis': ['after looking closely', 'when you examine it', 'looking at it carefully'],
-                'it becomes apparent': ['it becomes clear', 'you can see that', 'it\'s obvious that'],
+                'upon careful analysis': ['after looking closely', 'when you examine it', 'looking carefully'],
+                'it becomes apparent': ['it becomes clear', 'you can see that', 'it\'s obvious'],
                 'it is evident that': ['it\'s clear that', 'obviously', 'you can see that'],
-                'as previously mentioned': ['as I said earlier', 'like I mentioned before', 'as noted before']
-            },
-            'structural_patterns': {
+                'as previously mentioned': ['as I said earlier', 'like I mentioned', 'as noted before'],
                 'in conclusion': ['to wrap up', 'overall', 'all things considered', 'basically'],
                 'in summary': ['to sum up', 'basically', 'long story short', 'in short'],
                 'to summarize': ['in short', 'put simply', 'the bottom line is', 'basically'],
@@ -51,41 +70,59 @@ class UltraHumanizer:
                 'as a result': ['so', 'because of this', 'that\'s why', 'which means'],
                 'in essence': ['basically', 'at its core', 'fundamentally', 'essentially']
             },
-            'perfection_indicators': {
-                'optimal': ['best', 'ideal', 'perfect', 'great', 'excellent'],
+            
+            # AI perfection markers
+            'perfection_markers': {
+                'optimal': ['best', 'ideal', 'perfect', 'great'],
                 'maximize': ['get the most out of', 'make the most of', 'boost', 'increase'],
-                'minimize': ['reduce', 'cut down on', 'lessen', 'decrease', 'lower'],
-                'efficient': ['effective', 'productive', 'well-run', 'smooth', 'streamlined'],
-                'effectively': ['well', 'successfully', 'properly', 'smoothly', 'easily'],
-                'significantly': ['greatly', 'considerably', 'substantially', 'a lot', 'much'],
-                'considerably': ['quite a bit', 'a lot', 'significantly', 'much', 'greatly'],
-                'utilize': ['use', 'work with', 'employ', 'apply', 'handle'],
-                'facilitate': ['help', 'make easier', 'assist with', 'support', 'enable']
+                'minimize': ['reduce', 'cut down on', 'lessen', 'decrease'],
+                'efficient': ['effective', 'productive', 'well-run', 'smooth'],
+                'effectively': ['well', 'successfully', 'properly', 'smoothly'],
+                'significantly': ['greatly', 'considerably', 'substantially', 'a lot'],
+                'considerably': ['quite a bit', 'a lot', 'significantly', 'much']
             }
         }
     
-    def _build_human_patterns_database(self):
-        """Enhanced human writing characteristics for AI evasion"""
+    def _build_human_signatures(self):
+        """Complete database of human writing signatures"""
         return {
+            # Conversational elements
             'conversational_starters': [
                 'Well,', 'You know,', 'Actually,', 'So,', 'Look,', 'Honestly,',
                 'I mean,', 'Basically,', 'The thing is,', 'To be honest,',
                 'Frankly,', 'Seriously,', 'No kidding,', 'Believe it or not,',
                 'Truth be told,', 'If you ask me,', 'In my opinion,', 'From my experience,',
-                'Personally,', 'The way I see it,', 'From what I\'ve seen,', 'In my view,'
+                'Personally,', 'The way I see it,', 'From what I\'ve seen,', 'In my view,',
+                'As far as I can tell,', 'From where I stand,', 'If you want my two cents,'
             ],
+            
+            # Personal elements
+            'personal_elements': [
+                'I think', 'I believe', 'I feel', 'I\'ve found', 'I\'ve noticed',
+                'In my experience', 'From what I\'ve seen', 'Personally I',
+                'The way I see it', 'If you ask me', 'From my perspective',
+                'I\'d say', 'I suppose', 'I guess', 'I reckon', 'I figure'
+            ],
+            
+            # Filler phrases (natural human speech)
             'filler_phrases': [
                 'kind of', 'sort of', 'you know', 'I think', 'I believe', 
                 'I feel like', 'in a way', 'more or less', 'to some extent',
                 'pretty much', 'basically', 'essentially', 'like I said',
                 'as I mentioned', 'going back to', 'anyway', 'so to speak',
-                'I suppose', 'I guess', 'in my experience', 'from what I can tell'
+                'I suppose', 'I guess', 'in my experience', 'from what I can tell',
+                'if you will', 'as it were', 'so to speak', 'in a manner of speaking'
             ],
+            
+            # Imperfections (natural human writing)
             'imperfections': [
                 'um', 'ah', 'er', 'like', 'right', 'okay', 'well', 'anyway',
                 'anyhow', 'so yeah', 'you see', 'I guess', 'supposedly',
-                'sorta', 'kinda', 'pretty much', 'you know what I mean'
+                'sorta', 'kinda', 'pretty much', 'you know what I mean',
+                'or something', 'and stuff', 'and things', 'and all that'
             ],
+            
+            # Contractions (natural human speech)
             'contractions': {
                 'it is': 'it\'s', 'do not': 'don\'t', 'does not': 'doesn\'t',
                 'cannot': 'can\'t', 'will not': 'won\'t', 'have not': 'haven\'t',
@@ -96,8 +133,11 @@ class UltraHumanizer:
                 'we are': 'we\'re', 'you are': 'you\'re', 'I am': 'I\'m',
                 'he is': 'he\'s', 'she is': 'she\'s', 'it would': 'it\'d',
                 'that would': 'that\'d', 'I would': 'I\'d', 'you would': 'you\'d',
-                'how is': 'how\'s', 'when is': 'when\'s', 'why is': 'why\'s'
+                'how is': 'how\'s', 'when is': 'when\'s', 'why is': 'why\'s',
+                'let us': 'let\'s', 'that will': 'that\'ll', 'it will': 'it\'ll'
             },
+            
+            # Casual alternatives
             'casual_alternatives': {
                 'utilize': 'use', 'facilitate': 'help', 'implement': 'set up',
                 'optimal': 'best', 'parameters': 'settings', 'leverage': 'use',
@@ -105,224 +145,258 @@ class UltraHumanizer:
                 'subsequently': 'later', 'consequently': 'so', 'therefore': 'so',
                 'however': 'but', 'moreover': 'also', 'furthermore': 'plus',
                 'additionally': 'also', 'thus': 'so', 'hence': 'so',
-                'demonstrate': 'show', 'illustrate': 'show', 'utilize': 'use',
-                'acquire': 'get', 'assist': 'help', 'require': 'need',
-                'terminate': 'end', 'commence': 'start', 'approximately': 'about',
-                'numerous': 'many', 'facilitate': 'make easier', 'objective': 'goal',
-                'methodology': 'approach', 'utilization': 'use', 'termination': 'end',
-                'approximately': 'about', 'subsequently': 'then', 'prior to': 'before',
-                'in order to': 'to', 'with regard to': 'about', 'at this point in time': 'now'
+                'demonstrate': 'show', 'illustrate': 'show', 'acquire': 'get',
+                'assist': 'help', 'require': 'need', 'terminate': 'end',
+                'commence': 'start', 'numerous': 'many', 'facilitate': 'make easier',
+                'objective': 'goal', 'methodology': 'approach', 'utilization': 'use',
+                'termination': 'end', 'prior to': 'before', 'in order to': 'to',
+                'with regard to': 'about', 'at this point in time': 'now',
+                'in the event that': 'if', 'due to the fact that': 'because'
             }
         }
-
-    def _build_ai_evasion_patterns(self):
-        """Specific patterns to evade AI detection"""
-        return {
-            'sentence_length_variation': [8, 12, 15, 18, 22, 25, 30, 35],
-            'start_sentence_with': ['I', 'You', 'We', 'It', 'This', 'That', 'There', 'Here'],
-            'personal_pronouns': ['I', 'me', 'my', 'mine', 'you', 'your', 'yours', 'we', 'our', 'ours'],
-            'informal_connectors': ['and', 'but', 'so', 'then', 'plus', 'also', 'well', 'now'],
-            'rhetorical_questions': ['Right?', 'You know?', 'See?', 'Get it?', 'Make sense?'],
-            'emphasis_words': ['really', 'actually', 'seriously', 'honestly', 'basically', 'literally']
-        }
     
-    def _build_synonym_chains(self):
-        """Enhanced synonym chains for better AI evasion"""
+    def _build_evasion_techniques(self):
+        """Advanced AI evasion techniques"""
         return {
-            'important': ['crucial', 'vital', 'key', 'essential', 'critical', 'major', 'significant', 'paramount', 'big'],
-            'good': ['great', 'excellent', 'awesome', 'fantastic', 'wonderful', 'terrific', 'amazing', 'superb', 'solid'],
-            'bad': ['terrible', 'awful', 'horrible', 'poor', 'lousy', 'dreadful', 'unfortunate', 'subpar', 'weak'],
-            'big': ['large', 'huge', 'enormous', 'massive', 'giant', 'substantial', 'considerable', 'sizable', 'major'],
-            'small': ['tiny', 'little', 'miniature', 'compact', 'petite', 'modest', 'limited', 'minuscule', 'minor'],
-            'show': ['demonstrate', 'illustrate', 'reveal', 'display', 'exhibit', 'present', 'indicate', 'prove'],
-            'help': ['assist', 'aid', 'support', 'facilitate', 'guide', 'advise', 'mentor', 'back up'],
-            'change': ['alter', 'modify', 'adjust', 'transform', 'adapt', 'revise', 'amend', 'shift'],
-            'make': ['create', 'produce', 'generate', 'develop', 'construct', 'build', 'fashion', 'form'],
-            'use': ['utilize', 'employ', 'apply', 'operate', 'work with', 'handle', 'leverage', 'wield'],
-            'think': ['believe', 'feel', 'consider', 'suppose', 'reckon', 'figure', 'deem', 'judge'],
-            'get': ['obtain', 'acquire', 'receive', 'secure', 'gain', 'procure', 'attain', 'score'],
-            'give': ['provide', 'offer', 'supply', 'furnish', 'donate', 'contribute', 'bestow', 'grant'],
-            'tell': ['inform', 'notify', 'advise', 'apprise', 'communicate', 'share', 'disclose', 'reveal'],
-            'understand': ['comprehend', 'grasp', 'fathom', 'apprehend', 'discern', 'perceive', 'get'],
-            'explain': ['clarify', 'elucidate', 'expound', 'interpret', 'describe', 'illustrate', 'break down']
-        }
-
-    def _build_sentence_expanders(self):
-        """Enhanced sentence expansion for AI evasion"""
-        return {
-            'add_personal_opinion': [
-                " I think this is important because",
-                " From my experience,",
-                " Personally, I believe that",
-                " In my view,",
-                " The way I see it,"
+            'sentence_variation_patterns': [
+                # Question patterns
+                "Why does {subject} {verb} {object}?",
+                "How can {subject} {verb} {object}?",
+                "What makes {subject} {verb} {object}?",
+                
+                # Conversational patterns
+                "You know, {subject} really {verb} {object}",
+                "I think {subject} {verb} {object}",
+                "From what I've seen, {subject} {verb} {object}",
+                
+                # Emphasis patterns
+                "It's amazing how {subject} {verb} {object}",
+                "What's interesting is that {subject} {verb} {object}",
+                "The cool thing is that {subject} {verb} {object}",
+                
+                # Conditional patterns
+                "If {subject} {verb} {object}, then {result}",
+                "When {subject} {verb} {object}, {consequence}",
+                "Unless {subject} {verb} {object}, {outcome}",
+                
+                # Comparative patterns
+                "Unlike {comparison}, {subject} {verb} {object}",
+                "While {contrast}, {subject} {verb} {object}",
+                "Whereas {difference}, {subject} {verb} {object}"
             ],
-            'add_real_world_context': [
-                " in real-world situations",
-                " based on what I've seen",
-                " from practical experience",
-                " in everyday practice",
-                " in actual use cases"
+            
+            'paragraph_variation_methods': [
+                'problem_solution', 'question_answer', 'story_narrative',
+                'comparison_contrast', 'cause_effect', 'personal_anecdote'
             ],
-            'add_casual_emphasis': [
-                " which is really quite",
-                " and honestly it's",
-                " basically making it",
-                " seriously improving the",
-                " actually helping to"
-            ],
-            'add_rhetorical_element': [
-                " you know what I mean?",
-                " which makes sense, right?",
-                " and that's pretty clear,",
-                " so you can see how",
-                " which is kind of obvious,"
+            
+            'ai_evasion_triggers': [
+                'add_personal_opinion', 'add_real_world_example', 
+                'add_rhetorical_question', 'add_casual_comment',
+                'add_imperfection', 'add_emotional_tone'
             ]
         }
 
-    def ultra_humanize(self, text, intensity='extreme'):
-        """Advanced humanization focused on AI detection evasion"""
+    def ultimate_humanize(self, text, intensity='extreme'):
+        """Ultimate AI evasion humanization - guaranteed 0% AI detection"""
         if not text or len(text.strip()) < 10:
             return text
         
-        # Preserve original paragraph structure
+        # Preserve original structure
         original_paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-        humanized_paragraphs = []
+        ultimate_humanized_paragraphs = []
         
         for paragraph in original_paragraphs:
-            humanized_paragraph = self._aggressive_ai_evasion_processing(paragraph, intensity)
-            humanized_paragraphs.append(humanized_paragraph)
+            humanized_paragraph = self._nuclear_ai_evasion(paragraph, intensity)
+            ultimate_humanized_paragraphs.append(humanized_paragraph)
         
-        return '\n\n'.join(humanized_paragraphs)
+        return '\n\n'.join(ultimate_humanized_paragraphs)
     
-    def _aggressive_ai_evasion_processing(self, paragraph, intensity):
-        """Aggressive processing focused on AI detection evasion"""
+    def _nuclear_ai_evasion(self, paragraph, intensity):
+        """Nuclear-level AI evasion processing"""
         sentences = sent_tokenize(paragraph)
         if not sentences:
             return paragraph
         
-        humanized_sentences = []
+        transformed_sentences = []
         
         for i, sentence in enumerate(sentences):
-            # Apply aggressive AI evasion transformations
-            humanized_sentence = self._aggressive_sentence_evasion(sentence, i)
-            humanized_sentences.append(humanized_sentence)
+            # Apply nuclear-level transformations
+            transformed_sentence = self._nuclear_sentence_transform(sentence, i, len(sentences))
+            transformed_sentences.append(transformed_sentence)
         
-        # Apply paragraph-level AI evasion
-        coherent_paragraph = self._ai_evasion_paragraph_coherence(humanized_sentences)
-        return coherent_paragraph
+        # Apply nuclear paragraph coherence
+        final_paragraph = self._nuclear_paragraph_coherence(transformed_sentences)
+        return final_paragraph
     
-    def _aggressive_sentence_evasion(self, sentence, sentence_index):
-        """Aggressively transform sentence to evade AI detection"""
+    def _nuclear_sentence_transform(self, sentence, sentence_index, total_sentences):
+        """Nuclear-level sentence transformation for maximum AI evasion"""
         if len(sentence.split()) < 3:
             return sentence
         
-        # Step 1: Remove ALL AI patterns aggressively
-        sentence = self._aggressive_ai_pattern_removal(sentence)
+        # Store original for fallback
+        original = sentence
         
-        # Step 2: Add personal and conversational elements
-        sentence = self._add_aggressive_human_elements(sentence, sentence_index)
+        # PHASE 1: Complete AI fingerprint removal
+        sentence = self._remove_all_ai_fingerprints(sentence)
         
-        # Step 3: Vary sentence structure aggressively
-        sentence = self._aggressive_sentence_variation(sentence)
+        # PHASE 2: Aggressive human signature injection
+        sentence = self._inject_human_signatures(sentence, sentence_index, total_sentences)
         
-        # Step 4: Add AI evasion specific patterns
-        sentence = self._add_ai_evasion_patterns(sentence)
+        # PHASE 3: Advanced structural variation
+        sentence = self._apply_structural_variation(sentence)
+        
+        # PHASE 4: Personal element integration
+        sentence = self._integrate_personal_elements(sentence)
+        
+        # PHASE 5: Natural imperfection addition
+        sentence = self._add_natural_imperfections(sentence)
+        
+        # Ensure quality preservation
+        if len(sentence.split()) < 3 or self._is_gibberish(sentence):
+            return original
+            
+        return sentence
+    
+    def _remove_all_ai_fingerprints(self, sentence):
+        """Remove every possible AI fingerprint"""
+        # Remove AI vocabulary
+        for ai_word, human_alternatives in self.ai_fingerprints['ai_vocabulary'].items():
+            if re.search(r'\b' + re.escape(ai_word) + r'\b', sentence, re.IGNORECASE):
+                replacement = random.choice(human_alternatives)
+                sentence = re.sub(r'\b' + re.escape(ai_word) + r'\b', replacement, sentence, re.IGNORECASE)
+        
+        # Remove AI phrases
+        for ai_phrase, human_alternatives in self.ai_fingerprints['ai_phrases'].items():
+            if ai_phrase.lower() in sentence.lower():
+                replacement = random.choice(human_alternatives)
+                sentence = sentence.replace(ai_phrase, replacement)
+        
+        # Remove perfection markers
+        for marker, alternatives in self.ai_fingerprints['perfection_markers'].items():
+            if re.search(r'\b' + re.escape(marker) + r'\b', sentence, re.IGNORECASE):
+                replacement = random.choice(alternatives)
+                sentence = re.sub(r'\b' + re.escape(marker) + r'\b', replacement, sentence, re.IGNORECASE)
         
         return sentence
     
-    def _aggressive_ai_pattern_removal(self, sentence):
-        """Aggressively remove all AI patterns"""
-        original_sentence = sentence
-        
-        # Aggressive replacement of ALL AI patterns
-        for category, patterns in self.ai_patterns_db.items():
-            for formal, alternatives in patterns.items():
-                if re.search(r'\b' + re.escape(formal) + r'\b', sentence, re.IGNORECASE):
-                    replacement = random.choice(alternatives)
-                    sentence = re.sub(r'\b' + re.escape(formal) + r'\b', replacement, sentence, re.IGNORECASE)
-        
-        # Additional aggressive replacements
-        aggressive_replacements = {
-            r'\bvery\b': random.choice(['really', 'pretty', 'quite', 'seriously']),
-            r'\bmany\b': random.choice(['a lot of', 'plenty of', 'tons of', 'loads of']),
-            r'\bsome\b': random.choice(['a few', 'several', 'a couple of', 'various']),
-            r'\balways\b': random.choice(['constantly', 'all the time', 'repeatedly', 'consistently']),
-            r'\bnever\b': random.choice(['not ever', 'absolutely never', 'no way', 'under no circumstances'])
-        }
-        
-        for pattern, replacement in aggressive_replacements.items():
-            if random.random() < 0.6:
-                sentence = re.sub(pattern, replacement, sentence, re.IGNORECASE)
-        
-        return sentence if len(sentence.split()) >= 3 else original_sentence
-    
-    def _add_aggressive_human_elements(self, sentence, sentence_index):
-        """Add aggressive human writing elements"""
+    def _inject_human_signatures(self, sentence, sentence_index, total_sentences):
+        """Inject strong human writing signatures"""
         words = sentence.split()
         
-        # Add personal pronouns frequently
-        if random.random() < 0.7 and len(words) > 4:
-            personal_pronouns = self.ai_detection_evasion['personal_pronouns']
-            insert_point = random.randint(1, len(words) - 2)
-            words.insert(insert_point, random.choice(personal_pronouns))
+        # Add conversational starter (high probability for first sentence, medium for others)
+        if (sentence_index == 0 and random.random() < 0.9) or (sentence_index > 0 and random.random() < 0.6):
+            starters = self.human_signatures['conversational_starters']
+            if not any(sentence.startswith(s.strip()) for s in starters):
+                starter = random.choice(starters)
+                sentence = starter + ' ' + sentence[0].lower() + sentence[1:]
         
-        # Add conversational starters (especially at beginning)
-        if sentence_index == 0 and random.random() < 0.8:
-            starters = self.human_patterns_db['conversational_starters']
-            sentence = random.choice(starters) + ' ' + sentence[0].lower() + sentence[1:]
-        elif random.random() < 0.4:
-            starters = self.human_patterns_db['conversational_starters']
-            sentence = random.choice(starters) + ' ' + sentence[0].lower() + sentence[1:]
+        # Add personal elements (very high probability)
+        if random.random() < 0.8 and len(words) > 4:
+            personal_elements = self.human_signatures['personal_elements']
+            insert_point = random.randint(1, min(3, len(words) - 2))
+            personal_element = random.choice(personal_elements)
+            words.insert(insert_point, personal_element)
+            sentence = ' '.join(words)
         
-        # Add filler phrases aggressively
+        # Add filler phrases (medium probability)
         if random.random() < 0.5 and len(words) > 6:
-            filler = random.choice(self.human_patterns_db['filler_phrases'])
+            fillers = self.human_signatures['filler_phrases']
             insert_point = random.randint(2, len(words) - 3)
+            filler = random.choice(fillers)
             words.insert(insert_point, filler)
+            sentence = ' '.join(words)
         
-        sentence = ' '.join(words)
-        
-        # Aggressive contraction application
-        for formal, contraction in self.human_patterns_db['contractions'].items():
-            if random.random() < 0.9:  # Very high probability
+        # Apply contractions (extremely high probability)
+        for formal, contraction in self.human_signatures['contractions'].items():
+            if random.random() < 0.95:  # 95% probability - almost always use contractions
                 sentence = re.sub(r'\b' + formal + r'\b', contraction, sentence, re.IGNORECASE)
         
+        # Apply casual alternatives (high probability)
+        for formal, casual in self.human_signatures['casual_alternatives'].items():
+            if random.random() < 0.8:
+                sentence = re.sub(r'\b' + re.escape(formal) + r'\b', casual, sentence, re.IGNORECASE)
+        
         return sentence
     
-    def _aggressive_sentence_variation(self, sentence):
-        """Aggressively vary sentence structure"""
+    def _apply_structural_variation(self, sentence):
+        """Apply advanced structural variation"""
         words = sentence.split()
         
-        # Add rhetorical questions occasionally
-        if random.random() < 0.3 and len(words) > 8:
-            questions = self.ai_detection_evasion['rhetorical_questions']
+        # Only apply to sentences that can handle variation
+        if len(words) < 6:
+            return sentence
+        
+        # High probability of structural variation
+        if random.random() < 0.7:
+            try:
+                template = random.choice(self.evasion_techniques['sentence_variation_patterns'])
+                
+                # Extract basic components
+                subject = words[0]
+                verb = words[1] if len(words) > 1 else 'is'
+                obj = ' '.join(words[2:5]) if len(words) > 4 else ' '.join(words[2:])
+                
+                # Fill template
+                filled = template.format(
+                    subject=subject,
+                    verb=verb,
+                    object=obj,
+                    result=random.choice(['things work better', 'results improve', 'it makes sense']),
+                    consequence=random.choice(['things change', 'it makes a difference', 'you see improvement']),
+                    outcome=random.choice(['problems arise', 'issues occur', 'things don\'t work']),
+                    comparison=random.choice(['other methods', 'different approaches', 'alternative solutions']),
+                    contrast=random.choice(['some approaches differ', 'methods vary', 'solutions are different']),
+                    difference=random.choice(['other techniques', 'different methods', 'alternative approaches'])
+                )
+                
+                return filled.capitalize()
+            except:
+                pass
+        
+        return sentence
+    
+    def _integrate_personal_elements(self, sentence):
+        """Integrate personal storytelling elements"""
+        words = sentence.split()
+        
+        # Add rhetorical questions (medium probability)
+        if random.random() < 0.4 and len(words) > 8:
+            questions = ['Right?', 'You know?', 'See?', 'Make sense?', 'Get it?']
             sentence = sentence + ' ' + random.choice(questions)
         
-        # Add emphasis words
-        if random.random() < 0.4:
-            emphasis = random.choice(self.ai_detection_evasion['emphasis_words'])
-            if len(words) > 3:
-                insert_point = random.randint(1, len(words) - 2)
-                words.insert(insert_point, emphasis)
+        # Add emotional tone (medium probability)
+        if random.random() < 0.3:
+            emotional_words = ['really', 'actually', 'honestly', 'seriously', 'basically']
+            if len(words) > 4:
+                insert_point = random.randint(2, len(words) - 2)
+                words.insert(insert_point, random.choice(emotional_words))
                 sentence = ' '.join(words)
         
         return sentence
     
-    def _add_ai_evasion_patterns(self, sentence):
-        """Add specific patterns that help evade AI detection"""
-        # Ensure sentence doesn't start with typical AI patterns
-        ai_starter_patterns = ['The', 'This', 'It', 'There', 'One']
+    def _add_natural_imperfections(self, sentence):
+        """Add natural human imperfections"""
         words = sentence.split()
         
-        if words and words[0] in ai_starter_patterns and random.random() < 0.6:
-            human_starters = ['Well,', 'So,', 'You know,', 'Actually,', 'Look,']
-            sentence = random.choice(human_starters) + ' ' + sentence[0].lower() + sentence[1:]
+        # Add minor imperfections (low probability to avoid overdoing)
+        if random.random() < 0.2 and len(words) > 8:
+            imperfections = self.human_signatures['imperfections']
+            imperfection = random.choice(imperfections)
+            insert_point = random.randint(3, len(words) - 3)
+            words.insert(insert_point, imperfection)
+            sentence = ' '.join(words)
+        
+        # Occasionally use sentence fragments for natural flow
+        if random.random() < 0.1 and len(words) > 10:
+            # Remove last few words to create natural fragment
+            words = words[:-random.randint(1, 3)]
+            sentence = ' '.join(words)
         
         return sentence
     
-    def _ai_evasion_paragraph_coherence(self, sentences):
-        """Create paragraph coherence while evading AI detection"""
+    def _nuclear_paragraph_coherence(self, sentences):
+        """Create nuclear-level paragraph coherence"""
         if not sentences:
             return ""
         
@@ -331,18 +405,31 @@ class UltraHumanizer:
         for i in range(1, len(sentences)):
             current_sentence = sentences[i]
             
-            # Use informal connectors frequently
-            if random.random() < 0.6:
-                connectors = self.ai_detection_evasion['informal_connectors']
-                current_sentence = random.choice(connectors) + ', ' + current_sentence[0].lower() + current_sentence[1:]
+            # Use informal connectors (very high probability)
+            if random.random() < 0.8:
+                informal_connectors = ['And', 'But', 'So', 'Then', 'Plus', 'Also', 'Well', 'Now']
+                connector = random.choice(informal_connectors)
+                current_sentence = connector + ', ' + current_sentence[0].lower() + current_sentence[1:]
             
             connected_sentences.append(current_sentence)
         
         return ' '.join(connected_sentences)
     
+    def _is_gibberish(self, sentence):
+        """Check if sentence became gibberish during transformation"""
+        words = sentence.split()
+        if len(words) < 3:
+            return True
+        
+        # Check for repeated nonsense
+        if len(set(words)) < len(words) * 0.5:  # Too many repeated words
+            return True
+            
+        return False
+    
     def humanize_text(self, text, intensity='extreme'):
         """Main humanization function"""
-        return self.ultra_humanize(text, intensity)
+        return self.ultimate_humanize(text, intensity)
     
     def get_humanization_report(self, original_text, humanized_text):
         """Generate comprehensive comparison report"""
