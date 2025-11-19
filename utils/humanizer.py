@@ -3,7 +3,6 @@ import random
 import numpy as np
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
-import language_tool_python
 from utils.text_analyzer import TextAnalyzer
 
 class UltraHumanizer:
@@ -75,7 +74,10 @@ class UltraHumanizer:
                 'commence': 'start', 'terminate': 'end', 'approximately': 'about',
                 'subsequently': 'later', 'consequently': 'so', 'therefore': 'so',
                 'however': 'but', 'moreover': 'also', 'furthermore': 'plus',
-                'additionally': 'also', 'thus': 'so', 'hence': 'so'
+                'additionally': 'also', 'thus': 'so', 'hence': 'so',
+                'demonstrate': 'show', 'illustrate': 'show', 'utilize': 'use',
+                'acquire': 'get', 'assist': 'help', 'require': 'need',
+                'terminate': 'end', 'commence': 'start', 'approximately': 'about'
             }
         }
     
@@ -91,7 +93,11 @@ class UltraHumanizer:
             'help': ['assist', 'aid', 'support', 'facilitate', 'guide', 'advise'],
             'change': ['alter', 'modify', 'adjust', 'transform', 'adapt', 'revise'],
             'make': ['create', 'produce', 'generate', 'develop', 'construct', 'build'],
-            'use': ['utilize', 'employ', 'apply', 'operate', 'work with', 'handle']
+            'use': ['utilize', 'employ', 'apply', 'operate', 'work with', 'handle'],
+            'think': ['believe', 'feel', 'consider', 'suppose', 'reckon', 'figure'],
+            'get': ['obtain', 'acquire', 'receive', 'secure', 'gain', 'procure'],
+            'give': ['provide', 'offer', 'supply', 'furnish', 'donate', 'contribute'],
+            'tell': ['inform', 'notify', 'advise', 'apprise', 'communicate', 'share']
         }
     
     def _build_sentence_blueprints(self):
@@ -112,7 +118,11 @@ class UltraHumanizer:
             # Personal
             "I think {subject} {verb} {object}",
             # Comparative
-            "When {subject} {verb} {object}, it's like {comparison}"
+            "When {subject} {verb} {object}, it's like {comparison}",
+            # Conditional
+            "If {subject} {verb} {object}, then {result}",
+            # Temporal
+            "When {subject} {verb} {object}, {consequence}"
         ]
 
     def ultra_humanize(self, text, intensity='extreme'):
@@ -142,7 +152,7 @@ class UltraHumanizer:
         """Remove all AI fingerprints"""
         # Remove formal transitions
         for pattern in self.ai_patterns_db['formal_transitions']:
-            alternatives = ['but', 'and', 'so', 'also', 'plus', 'then', 'now']
+            alternatives = ['but', 'and', 'so', 'also', 'plus', 'then', 'now', 'though']
             replacement = random.choice(alternatives)
             text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
         
@@ -150,14 +160,20 @@ class UltraHumanizer:
         for pattern in self.ai_patterns_db['academic_phrases']:
             casual_versions = [
                 'keep in mind that', 'remember that', 'note that', 
-                'don\'t forget', 'it\'s worth remembering'
+                'don\'t forget', 'it\'s worth remembering', 'just so you know'
             ]
             replacement = random.choice(casual_versions)
             text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
         
         # Eliminate structural patterns
         for pattern in self.ai_patterns_db['structural_patterns']:
-            text = re.sub(pattern, '', text, flags=re.IGNECASE)
+            text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+        
+        # Replace perfection indicators
+        for pattern in self.ai_patterns_db['perfection_indicators']:
+            casual_versions = ['best', 'good', 'great', 'helpful', 'useful', 'nice']
+            replacement = random.choice(casual_versions)
+            text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
         
         return text
     
@@ -232,7 +248,7 @@ class UltraHumanizer:
         clauses = re.split(r'[,;]', sentence)
         if len(clauses) > 1:
             random.shuffle(clauses)
-            connectors = ['and', 'but', 'while', 'though', 'although']
+            connectors = ['and', 'but', 'while', 'though', 'although', 'since', 'because']
             sentence = ' '.join(clauses[0:1] + [random.choice(connectors)] + clauses[1:])
         
         return sentence
@@ -243,10 +259,12 @@ class UltraHumanizer:
         new_words = []
         
         adjective_intensity = {
-            'good': ['pretty good', 'quite good', 'really good', 'fairly good'],
-            'bad': ['pretty bad', 'quite bad', 'really bad', 'fairly bad'],
-            'big': ['pretty big', 'quite big', 'really big', 'fairly big'],
-            'small': ['pretty small', 'quite small', 'really small', 'fairly small']
+            'good': ['pretty good', 'quite good', 'really good', 'fairly good', 'kinda good'],
+            'bad': ['pretty bad', 'quite bad', 'really bad', 'fairly bad', 'kinda bad'],
+            'big': ['pretty big', 'quite big', 'really big', 'fairly big', 'kinda big'],
+            'small': ['pretty small', 'quite small', 'really small', 'fairly small', 'kinda small'],
+            'important': ['pretty important', 'quite important', 'really important', 'fairly important'],
+            'interesting': ['pretty interesting', 'quite interesting', 'really interesting', 'fairly interesting']
         }
         
         i = 0
@@ -272,18 +290,27 @@ class UltraHumanizer:
             verb = words[1] if len(words) > 1 else 'is'
             obj = ' '.join(words[2:4]) if len(words) > 3 else ' '.join(words[2:])
             
-            # Apply blueprint with extracted components
-            new_sentence = blueprint.format(
-                subject=subject,
-                verb=verb,
-                object=obj,
-                adverb=random.choice(['really', 'actually', 'basically']),
-                preposition=random.choice(['in', 'on', 'with', 'about']),
-                context=random.choice(['this case', 'general', 'practice']),
-                comparison=random.choice(['nothing else', 'something special', 'usual'])
-            )
+            # Fillers for the blueprint
+            fillers = {
+                'adverb': random.choice(['really', 'actually', 'basically', 'pretty much']),
+                'preposition': random.choice(['in', 'on', 'with', 'about', 'for']),
+                'context': random.choice(['this case', 'general', 'practice', 'most situations']),
+                'comparison': random.choice(['nothing else', 'something special', 'the usual thing']),
+                'result': random.choice(['things work out', 'it makes sense', 'everything falls into place']),
+                'consequence': random.choice(['things change', 'it makes a difference', 'you see results'])
+            }
             
-            return new_sentence.capitalize()
+            # Apply blueprint with extracted components
+            try:
+                new_sentence = blueprint.format(
+                    subject=subject,
+                    verb=verb,
+                    object=obj,
+                    **fillers
+                )
+                return new_sentence.capitalize()
+            except:
+                return sentence
         
         return sentence
     
@@ -324,11 +351,11 @@ class UltraHumanizer:
     def _add_variation(self, word):
         """Add natural human variation to words"""
         variations = {
-            'very': ['really', 'pretty', 'quite', 'seriously'],
-            'many': ['a lot of', 'plenty of', 'tons of', 'a bunch of'],
-            'some': ['a few', 'several', 'a couple of', 'various'],
-            'always': ['constantly', 'continually', 'repeatedly', 'time and again'],
-            'never': ['not ever', 'absolutely never', 'under no circumstances']
+            'very': ['really', 'pretty', 'quite', 'seriously', 'super'],
+            'many': ['a lot of', 'plenty of', 'tons of', 'a bunch of', 'loads of'],
+            'some': ['a few', 'several', 'a couple of', 'various', 'a handful of'],
+            'always': ['constantly', 'continually', 'repeatedly', 'time and again', 'all the time'],
+            'never': ['not ever', 'absolutely never', 'under no circumstances', 'no way']
         }
         
         if word in variations and random.random() < 0.4:
@@ -401,19 +428,19 @@ class UltraHumanizer:
         
         # Add rhetorical questions
         if random.random() < 0.4:
-            question_points = ['Right?', 'You know?', 'See what I mean?', 'Make sense?']
+            question_points = ['Right?', 'You know?', 'See what I mean?', 'Make sense?', 'Get it?']
             insert_point = random.randint(len(words)//3, 2*len(words)//3)
             words.insert(insert_point, random.choice(question_points))
         
         # Add personal references
         if random.random() < 0.3:
-            personal_refs = ['I think', 'I believe', 'In my experience', 'From what I\'ve seen']
+            personal_refs = ['I think', 'I believe', 'In my experience', 'From what I\'ve seen', 'Personally']
             insert_point = random.randint(5, len(words) - 5)
             words.insert(insert_point, random.choice(personal_refs))
         
         # Add emphasis markers
         if random.random() < 0.5:
-            emphasis = ['really', 'actually', 'seriously', 'honestly']
+            emphasis = ['really', 'actually', 'seriously', 'honestly', 'literally']
             insert_point = random.randint(10, len(words) - 10)
             words.insert(insert_point, random.choice(emphasis))
         
@@ -436,7 +463,7 @@ class UltraHumanizer:
             
             # Add hesitation markers
             if random.random() < 0.15:
-                hesitations = ['um', 'ah', 'like', 'you know']
+                hesitations = ['um', 'ah', 'like', 'you know', 'well']
                 insert_point = random.randint(1, len(words) - 1)
                 words.insert(insert_point, random.choice(hesitations))
             
@@ -463,7 +490,7 @@ class UltraHumanizer:
         text = re.sub(r'\s+([.,!?])', r'\1', text)
         
         # Add final conversational elements
-        starters = ['Well, ', 'So, ', 'Anyway, ', 'Look, ']
+        starters = ['Well, ', 'So, ', 'Anyway, ', 'Look, ', 'You know, ']
         if random.random() < 0.5 and not any(text.startswith(s.strip()) for s in starters):
             text = random.choice(starters) + text[0].lower() + text[1:]
         
@@ -484,17 +511,7 @@ class UltraHumanizer:
 
     def humanize_text(self, text, intensity='extreme'):
         """Main humanization function with intensity levels"""
-        intensity_map = {
-            'low': 0.3,
-            'medium': 0.6,
-            'high': 0.8,
-            'extreme': 1.0
-        }
-        
-        intensity_level = intensity_map.get(intensity, 1.0)
-        
-        # Apply ultra humanization
-        return self.ultra_humanize(text, intensity_level)
+        return self.ultra_humanize(text, intensity)
     
     def get_humanization_report(self, original_text, humanized_text):
         """Generate comprehensive comparison report"""
