@@ -1,13 +1,11 @@
 import re
 import random
 from nltk.tokenize import sent_tokenize
-import language_tool_python
 from utils.text_analyzer import TextAnalyzer
 
 class Humanizer:
     def __init__(self):
         self.analyzer = TextAnalyzer()
-        self.tool = language_tool_python.LanguageTool('en-US')
         
         # Human-like variations
         self.transition_alternatives = {
@@ -29,11 +27,19 @@ class Humanizer:
             r'\bimplement\b': ['put in place', 'set up'],
             r'\boptimal\b': ['best', 'ideal'],
             r'\bparameters\b': ['settings', 'limits'],
-            r'\bleverage\b': ['use', 'make use of']
+            r'\bleverage\b': ['use', 'make use of'],
+            r'\bcommence\b': ['start', 'begin'],
+            r'\bterminate\b': ['end', 'stop'],
+            r'\bapproximately\b': ['about', 'around'],
+            r'\bsubsequently\b': ['later', 'afterwards'],
+            r'\bconsequently\b': ['so', 'as a result']
         }
 
     def humanize_text(self, text, intensity='medium'):
         """Main humanization function"""
+        if not text or len(text.strip()) < 10:
+            return text
+            
         humanized = text
         
         # Apply transformations based on intensity
@@ -44,7 +50,7 @@ class Humanizer:
         else:  # high
             humanized = self._apply_advanced_humanization(humanized)
         
-        # Final grammar check and polish
+        # Final polish
         humanized = self._polish_text(humanized)
         
         return humanized
@@ -71,8 +77,8 @@ class Humanizer:
             # Occasionally start with conversational phrases
             if i > 0 and random.random() < 0.3:
                 starters = ['Well, ', 'You know, ', 'Actually, ', 'So, ']
-                if not sentence.startswith(tuple(s.startswith(' ') for s in starters)):
-                    sentence = random.choice(starters) + sentence.lower()
+                if not any(sentence.startswith(s.strip()) for s in starters):
+                    sentence = random.choice(starters) + sentence[0].lower() + sentence[1:]
             
             humanized_sentences.append(sentence)
         
@@ -88,7 +94,10 @@ class Humanizer:
             'has not': 'hasn\'t',
             'had not': 'hadn\'t',
             'would not': 'wouldn\'t',
-            'should not': 'shouldn\'t'
+            'should not': 'shouldn\'t',
+            'could not': 'couldn\'t',
+            'that is': 'that\'s',
+            'what is': 'what\'s'
         }
         
         for formal, contraction in contractions.items():
@@ -108,10 +117,16 @@ class Humanizer:
             # Occasionally break long sentences
             modified_sentences = []
             for sentence in sentences:
-                if len(sentence.split()) > 25 and random.random() < 0.6:
-                    # Split long sentence
-                    words = sentence.split()
-                    split_point = random.randint(15, 20)
+                words = sentence.split()
+                if len(words) > 25 and random.random() < 0.6:
+                    # Split long sentence at natural break point
+                    split_points = [i for i, word in enumerate(words) 
+                                  if word.endswith(',') or word.endswith(';')]
+                    if split_points:
+                        split_point = random.choice(split_points) + 1
+                    else:
+                        split_point = random.randint(15, 20)
+                    
                     part1 = ' '.join(words[:split_point])
                     part2 = ' '.join(words[split_point:])
                     modified_sentences.extend([part1 + '.', part2.capitalize()])
@@ -123,28 +138,36 @@ class Humanizer:
         # Add more conversational elements
         conversational_inserts = [
             ' I mean,', ' Basically,', ' Honestly,', ' Actually,',
-            ' You see,', ' The thing is,', ' Look,'
+            ' You see,', ' The thing is,', ' Look,', ' Well,'
         ]
         
         words = text.split()
-        if len(words) > 50:
+        if len(words) > 50 and random.random() < 0.3:
             insert_point = random.randint(20, len(words) - 10)
-            if random.random() < 0.3:
-                words.insert(insert_point, random.choice(conversational_inserts))
-                text = ' '.join(words)
+            insert_phrase = random.choice(conversational_inserts)
+            words.insert(insert_point, insert_phrase)
+            text = ' '.join(words)
+        
+        # Add occasional filler words for natural flow
+        filler_words = ['like', 'you know', 'I think', 'sort of', 'kind of']
+        if len(words) > 30 and random.random() < 0.2:
+            insert_point = random.randint(10, len(words) - 5)
+            filler = random.choice(filler_words)
+            words.insert(insert_point, filler)
+            text = ' '.join(words)
         
         return text
     
     def _polish_text(self, text):
         """Final polishing of the text"""
-        # Fix any grammar issues introduced
-        matches = self.tool.check(text)
-        corrected_text = language_tool_python.utils.correct(text, matches)
+        # Ensure proper capitalization after sentence splits
+        sentences = sent_tokenize(text)
+        corrected_sentences = []
         
-        # Ensure proper capitalization
-        sentences = sent_tokenize(corrected_text)
-        corrected_sentences = [sentence[0].upper() + sentence[1:] if sentence else sentence 
-                             for sentence in sentences]
+        for sentence in sentences:
+            if sentence and sentence[0].isalpha():
+                sentence = sentence[0].upper() + sentence[1:]
+            corrected_sentences.append(sentence)
         
         return ' '.join(corrected_sentences)
     
@@ -157,7 +180,7 @@ class Humanizer:
             'readability_change': humanized_analysis['flesch_reading_ease'] - original_analysis['flesch_reading_ease'],
             'lexical_diversity_change': humanized_analysis['lexical_diversity'] - original_analysis['lexical_diversity'],
             'sentence_variety': abs(humanized_analysis['avg_sentence_length'] - original_analysis['avg_sentence_length']),
-            'grammar_improvement': original_analysis['grammar_errors'] - humanized_analysis['grammar_errors']
+            'word_count_change': humanized_analysis['word_count'] - original_analysis['word_count']
         }
         
         return {
