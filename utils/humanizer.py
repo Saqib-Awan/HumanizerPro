@@ -13,7 +13,7 @@ class UltraHumanizer:
         self.ai_patterns_db = self._build_ai_patterns_database()
         self.human_patterns_db = self._build_human_patterns_database()
         self.synonym_chains = self._build_synonym_chains()
-        self.sentence_templates = self._build_sentence_templates()
+        self.sentence_expanders = self._build_sentence_expanders()
         self.paragraph_structures = self._build_paragraph_structures()
         
     def _build_ai_patterns_database(self):
@@ -125,32 +125,41 @@ class UltraHumanizer:
             'understand': ['comprehend', 'grasp', 'fathom', 'apprehend', 'discern', 'perceive'],
             'explain': ['clarify', 'elucidate', 'expound', 'interpret', 'describe', 'illustrate']
         }
-    
-    def _build_sentence_templates(self):
-        """Professional sentence structure templates"""
-        return [
-            # Simple declarative
-            "{subject} {verb} {object}",
-            "{subject} {verb} {object} and {additional_action}",
-            "{subject} not only {verb} {object} but also {secondary_action}",
-            
-            # With description
-            "{subject}, which is {description}, {verb} {object}",
-            "{subject} {adverb} {verb} {object} in a way that {result}",
-            
-            # Comparative
-            "Unlike {comparison}, {subject} {verb} {object}",
-            "While {contrast}, {subject} {verb} {object}",
-            
-            # Causal
-            "Because {subject} {verb} {object}, {consequence}",
-            "When {condition}, {subject} {verb} {object}",
-            
-            # Professional conversational
-            "What's interesting is that {subject} {verb} {object}",
-            "It's worth noting how {subject} {verb} {object}",
-            "One thing to consider is that {subject} {verb} {object}"
-        ]
+
+    def _build_sentence_expanders(self):
+        """Professional sentence expansion templates"""
+        return {
+            'add_description': [
+                ", which is {description},",
+                ", a {description} approach,",
+                ", offering {description} benefits,"
+            ],
+            'add_purpose': [
+                " in order to {purpose}",
+                " with the goal of {purpose}",
+                " aiming to {purpose}"
+            ],
+            'add_context': [
+                " within the context of {context}",
+                " when considering {context}",
+                " especially in {context}"
+            ],
+            'add_result': [
+                " resulting in {result}",
+                " which leads to {result}",
+                " ultimately {result}"
+            ],
+            'add_comparison': [
+                " unlike {comparison}",
+                " compared to {comparison}",
+                " whereas {comparison}"
+            ],
+            'add_condition': [
+                " provided that {condition}",
+                " as long as {condition}",
+                " when {condition}"
+            ]
+        }
     
     def _build_paragraph_structures(self):
         """Professional paragraph organization patterns"""
@@ -169,7 +178,7 @@ class UltraHumanizer:
         ]
 
     def ultra_humanize(self, text, intensity='extreme'):
-        """Professional humanization that maintains perfect structure"""
+        """Professional humanization that expands sentences and maintains structure"""
         if not text or len(text.strip()) < 10:
             return text
         
@@ -178,14 +187,14 @@ class UltraHumanizer:
         humanized_paragraphs = []
         
         for paragraph in original_paragraphs:
-            humanized_paragraph = self._process_paragraph(paragraph, intensity)
+            humanized_paragraph = self._process_paragraph_professionally(paragraph, intensity)
             humanized_paragraphs.append(humanized_paragraph)
         
         # Reconstruct with original paragraph breaks
         return '\n\n'.join(humanized_paragraphs)
     
-    def _process_paragraph(self, paragraph, intensity):
-        """Process a single paragraph with professional humanization"""
+    def _process_paragraph_professionally(self, paragraph, intensity):
+        """Process a paragraph with professional expansion and structure preservation"""
         sentences = sent_tokenize(paragraph)
         if not sentences:
             return paragraph
@@ -193,30 +202,80 @@ class UltraHumanizer:
         humanized_sentences = []
         
         for sentence in sentences:
-            # Apply multiple professional transformations
-            humanized_sentence = self._professional_sentence_rewrite(sentence)
+            # Apply professional transformations that EXPAND sentences
+            humanized_sentence = self._professional_sentence_expansion(sentence)
             humanized_sentences.append(humanized_sentence)
         
-        # Apply paragraph-level coherence
-        coherent_paragraph = self._ensure_paragraph_coherence(humanized_sentences)
+        # Ensure paragraph coherence with expanded sentences
+        coherent_paragraph = self._ensure_paragraph_coherence_professional(humanized_sentences)
         return coherent_paragraph
     
-    def _professional_sentence_rewrite(self, sentence):
-        """Professionally rewrite a single sentence"""
-        if len(sentence.split()) < 4:  # Too short to rewrite meaningfully
+    def _professional_sentence_expansion(self, sentence):
+        """Professionally expand and enhance a sentence"""
+        if len(sentence.split()) < 3:  # Too short to work with
             return sentence
         
         # Step 1: Replace AI patterns with human alternatives
         sentence = self._replace_ai_patterns(sentence)
         
-        # Step 2: Vary vocabulary professionally
-        sentence = self._professional_vocabulary_variation(sentence)
+        # Step 2: Expand sentence professionally (instead of shortening)
+        sentence = self._expand_sentence_professionally(sentence)
         
-        # Step 3: Apply sentence structure variation
-        sentence = self._vary_sentence_structure(sentence)
+        # Step 3: Vary vocabulary professionally
+        sentence = self._professional_vocabulary_variation(sentence)
         
         # Step 4: Add natural human elements (subtly)
         sentence = self._add_subtle_human_elements(sentence)
+        
+        return sentence
+    
+    def _expand_sentence_professionally(self, sentence):
+        """Expand sentence length professionally while maintaining meaning"""
+        words = sentence.split()
+        
+        # Only expand if sentence is too short or could benefit from elaboration
+        if len(words) < 15 and random.random() < 0.7:
+            expansion_type = random.choice(list(self.sentence_expanders.keys()))
+            expansion_template = random.choice(self.sentence_expanders[expansion_type])
+            
+            # Apply appropriate expansion based on type
+            if expansion_type == 'add_description':
+                descriptions = ['highly effective', 'particularly useful', 'quite innovative', 'really practical']
+                expansion = expansion_template.format(description=random.choice(descriptions))
+                
+            elif expansion_type == 'add_purpose':
+                purposes = ['achieve better results', 'improve outcomes', 'enhance performance', 'streamline processes']
+                expansion = expansion_template.format(purpose=random.choice(purposes))
+                
+            elif expansion_type == 'add_context':
+                contexts = ['modern applications', 'today\'s environment', 'current scenarios', 'real-world situations']
+                expansion = expansion_template.format(context=random.choice(contexts))
+                
+            elif expansion_type == 'add_result':
+                results = ['significant improvements', 'better outcomes', 'enhanced efficiency', 'positive changes']
+                expansion = expansion_template.format(result=random.choice(results))
+                
+            elif expansion_type == 'add_comparison':
+                comparisons = ['traditional methods', 'older approaches', 'conventional techniques', 'standard practices']
+                expansion = expansion_template.format(comparison=random.choice(comparisons))
+                
+            elif expansion_type == 'add_condition':
+                conditions = ['implemented correctly', 'used properly', 'applied consistently', 'executed well']
+                expansion = expansion_template.format(condition=random.choice(conditions))
+            
+            # Insert expansion at appropriate position
+            if expansion_type in ['add_description', 'add_purpose']:
+                # Insert after main verb or object
+                if len(words) > 3:
+                    insert_pos = min(4, len(words) - 1)
+                    words = words[:insert_pos] + [expansion] + words[insert_pos:]
+                else:
+                    words.append(expansion)
+            else:
+                # Append to end for other expansion types
+                words.append(expansion)
+            
+            sentence = ' '.join(words)
         
         return sentence
     
@@ -264,13 +323,13 @@ class UltraHumanizer:
             new_word = word
             
             # Apply synonym replacement with context awareness
-            if original_word in self.synonym_chains and random.random() < 0.4:
+            if original_word in self.synonym_chains and random.random() < 0.3:  # Reduced probability
                 synonyms = self.synonym_chains[original_word]
                 # Choose a synonym that fits the context
                 new_word = random.choice(synonyms)
             
             # Apply casual alternatives for formal words
-            if original_word in self.human_patterns_db['casual_alternatives'] and random.random() < 0.6:
+            if original_word in self.human_patterns_db['casual_alternatives'] and random.random() < 0.5:
                 new_word = self.human_patterns_db['casual_alternatives'][original_word]
             
             # Preserve capitalization
@@ -281,78 +340,39 @@ class UltraHumanizer:
         
         return ' '.join(new_words)
     
-    def _vary_sentence_structure(self, sentence):
-        """Vary sentence structure professionally"""
-        words = sentence.split()
-        if len(words) < 6:  # Too short for structural changes
-            return sentence
-        
-        # Occasionally apply template-based restructuring
-        if random.random() < 0.5:
-            try:
-                template = random.choice(self.sentence_templates)
-                
-                # Simple subject-verb-object extraction (simplified)
-                subject = words[0]
-                verb = words[1] if len(words) > 1 else 'is'
-                obj = ' '.join(words[2:5]) if len(words) > 4 else ' '.join(words[2:])
-                
-                # Fill template with meaningful content
-                filled_template = template.format(
-                    subject=subject,
-                    verb=verb,
-                    object=obj,
-                    additional_action=random.choice(['works well', 'makes sense', 'helps considerably']),
-                    secondary_action=random.choice(['improves results', 'enhances quality', 'adds value']),
-                    description=random.choice(['quite effective', 'really useful', 'particularly helpful']),
-                    adverb=random.choice(['consistently', 'effectively', 'reliably']),
-                    result=random.choice(['achieves goals', 'produces outcomes', 'delivers results']),
-                    comparison=random.choice(['other approaches', 'different methods', 'alternative solutions']),
-                    contrast=random.choice(['some methods work differently', 'approaches vary', 'solutions differ']),
-                    consequence=random.choice(['results improve', 'outcomes are better', 'performance increases']),
-                    condition=random.choice(['implemented properly', 'used correctly', 'applied appropriately'])
-                )
-                
-                return filled_template.capitalize()
-            except:
-                # If template application fails, return original
-                return sentence
-        
-        return sentence
-    
     def _add_subtle_human_elements(self, sentence):
         """Add subtle human elements without being obvious"""
         words = sentence.split()
         
-        # Add occasional conversational elements (subtly)
-        if random.random() < 0.3 and len(words) > 8:
+        # Add occasional conversational elements (very subtle)
+        if random.random() < 0.2 and len(words) > 10:  # Reduced probability and increased length requirement
             # Add filler phrase
             filler = random.choice(self.human_patterns_db['filler_phrases'])
-            insert_point = random.randint(2, len(words) - 3)
+            insert_point = random.randint(3, len(words) - 4)  # More conservative insertion
             words.insert(insert_point, filler)
         
         # Add contractions naturally
         sentence = ' '.join(words)
         for formal, contraction in self.human_patterns_db['contractions'].items():
-            if random.random() < 0.7:
+            if random.random() < 0.6:  # Reduced probability
                 sentence = re.sub(r'\b' + formal + r'\b', contraction, sentence, re.IGNORECASE)
         
         return sentence
     
-    def _ensure_paragraph_coherence(self, sentences):
-        """Ensure paragraph maintains coherence and flow"""
+    def _ensure_paragraph_coherence_professional(self, sentences):
+        """Ensure paragraph maintains professional coherence and flow"""
         if not sentences:
             return ""
         
-        # Connect sentences naturally
+        # Connect sentences naturally with professional transitions
         connected_sentences = [sentences[0]]
         
         for i in range(1, len(sentences)):
             current_sentence = sentences[i]
             
-            # Occasionally add natural transitions
-            if random.random() < 0.4:
-                transitions = ['Plus,', 'Also,', 'Meanwhile,', 'Additionally,', 'Furthermore,']
+            # Add professional transitions (less frequent)
+            if random.random() < 0.3:  # Reduced probability
+                transitions = ['Additionally,', 'Furthermore,', 'Moreover,', 'Similarly,', 'Consequently,']
                 current_sentence = random.choice(transitions) + ' ' + current_sentence[0].lower() + current_sentence[1:]
             
             connected_sentences.append(current_sentence)
