@@ -1,5 +1,6 @@
 import re
 import random
+import string
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet
@@ -494,6 +495,26 @@ class Humanizer:
         text = re.sub(r'"\s+', '" ', text)
         
         return text.strip()
+    
+    def get_humanization_report(self, original_text, humanized_text):
+        """Generate humanization comparison report"""
+        return {
+            'original_length': len(original_text),
+            'humanized_length': len(humanized_text),
+            'original_words': len(original_text.split()),
+            'humanized_words': len(humanized_text.split()),
+            'changes_made': abs(len(original_text) - len(humanized_text)),
+            'ai_phrases_removed': self._count_ai_phrases(original_text) - self._count_ai_phrases(humanized_text),
+            'contractions_added': humanized_text.count("'") - original_text.count("'"),
+        }
+
+    def _count_ai_phrases(self, text):
+        """Count AI phrases in text"""
+        count = 0
+        text_lower = text.lower()
+        for phrase in self.ai_phrases.keys():
+            count += text_lower.count(phrase.lower())
+        return count
 
 
 # Example usage
@@ -513,5 +534,5 @@ if __name__ == "__main__":
     
     for intensity in ["low", "medium", "high", "maximum"]:
         print(f"{intensity.upper()} INTENSITY:")
-        print(humanizer.humanize(sample_text, intensity=intensity))
+        print(humanizer.humanize_text(sample_text, intensity=intensity))
         print("\n" + "="*50 + "\n")
