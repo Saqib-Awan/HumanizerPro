@@ -356,7 +356,7 @@ def show_text_humanizer(humanizer, analyzer):
                     progress_bar.progress(i + 1)
                 
                 # Apply humanization
-                humanized_text = humanizer.humanize_text(original_text, intensity)
+                humanized_text = humanizer.humanize(original_text, tone="neutral")
                 report = humanizer.get_humanization_report(original_text, humanized_text)
                 
                 # Display results

@@ -41,6 +41,11 @@ class Humanizer:
     returning the input text unchanged.
     """
 
+    def humanize_text(self, text: str, intensity=None):
+        # Map intensity to a tone if you like; for now just ignore it
+        tone = "neutral"
+        return self.humanize(text, tone=tone)
+    
     def __init__(self, config: Optional[HumanizerConfig] = None) -> None:
         self.config = config or HumanizerConfig()
 
