@@ -1,803 +1,517 @@
 import re
 import random
-import numpy as np
-from typing import Dict, List, Tuple, Optional
+import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.corpus import stopwords
-from dataclasses import dataclass
-import logging
+from nltk.corpus import wordnet
+from nltk.tag import pos_tag
 
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Safe NLTK imports with fallback
-try:
-    from nltk.tag import pos_tag
-    from nltk.corpus import wordnet
-    WORDNET_AVAILABLE = True
-except:
-    WORDNET_AVAILABLE = False
-    logger.warning("WordNet not available, using fallback mode")
-
-# Download required NLTK data safely
-def download_nltk_data():
-    """Download required NLTK data packages"""
-    try:
-        import nltk
-        required_packages = ['punkt', 'stopwords', 'averaged_perceptron_tagger', 'wordnet']
-        for package in required_packages:
+class Humanizer:
+    def __init__(self):
+        """Initialize the humanizer with all necessary components"""
+        # Download required NLTK data
+        self._setup_nltk()
+        
+        # AI-typical phrases that scream "I'm AI!"
+        self.ai_phrases = {
+            "it's important to note that": ["note that", "keep in mind", "remember", ""],
+            "it's worth noting that": ["notably", "interestingly", "by the way", ""],
+            "in today's digital age": ["nowadays", "today", "these days", "currently"],
+            "in conclusion": ["to wrap up", "overall", "bottom line", "so"],
+            "furthermore": ["also", "plus", "and", "what's more"],
+            "however": ["but", "yet", "though", "still"],
+            "therefore": ["so", "thus", "that's why", "hence"],
+            "additionally": ["also", "plus", "and", "too", "besides"],
+            "consequently": ["as a result", "so", "because of this"],
+            "nevertheless": ["still", "even so", "yet", "but"],
+            "moreover": ["besides", "also", "plus", "on top of that"],
+            "thus": ["so", "therefore", "that's why"],
+            "indeed": ["in fact", "actually", "really", "truly"],
+            "significantly": ["greatly", "a lot", "substantially", "majorly"],
+            "it is essential to": ["you must", "you need to", "make sure to", "don't forget to"],
+            "individuals": ["people", "folks", "everyone", "users"],
+            "utilize": ["use", "employ", "leverage"],
+            "obtain": ["get", "acquire", "grab", "gain"],
+            "assist": ["help", "aid", "support"],
+            "regarding": ["about", "concerning", "on", "around"],
+            "in order to": ["to", "so you can", ""],
+            "due to the fact that": ["because", "since", "as"],
+            "at this point in time": ["now", "currently", "right now", "today"],
+            "for the purpose of": ["for", "to", "so you can"],
+            "in the event that": ["if", "when", "should"],
+            "prior to": ["before", "ahead of"],
+            "subsequent to": ["after", "following", "later"],
+            "a number of": ["several", "many", "some", "a few"],
+            "in the near future": ["soon", "shortly", "before long"],
+            "at the present time": ["now", "currently", "today"],
+            "it is recommended that": ["you should", "try to", "consider", "I'd recommend"],
+            "one must": ["you should", "you need to", "make sure to"],
+        }
+        
+        # Contractions for natural flow
+        self.contractions = {
+            "do not": "don't", "does not": "doesn't", "did not": "didn't",
+            "is not": "isn't", "are not": "aren't", "was not": "wasn't",
+            "were not": "weren't", "have not": "haven't", "has not": "hasn't",
+            "had not": "hadn't", "will not": "won't", "would not": "wouldn't",
+            "should not": "shouldn't", "could not": "couldn't", "cannot": "can't",
+            "it is": "it's", "that is": "that's", "there is": "there's",
+            "what is": "what's", "who is": "who's", "where is": "where's",
+            "I am": "I'm", "you are": "you're", "we are": "we're",
+            "they are": "they're", "I have": "I've", "you have": "you've",
+            "we have": "we've", "they have": "they've", "I will": "I'll",
+            "you will": "you'll", "we will": "we'll", "they will": "they'll",
+        }
+        
+        # Sentence starters variety
+        self.sentence_starters = [
+            "Look,", "Well,", "So,", "Now,", "Anyway,", "Actually,", 
+            "Honestly,", "Frankly,", "To be fair,", "Here's the thing:"
+        ]
+        
+        # Filler phrases for natural flow
+        self.natural_fillers = [
+            "you know", "I mean", "basically", "pretty much", "kind of",
+            "sort of", "more or less", "in a way", "at the end of the day"
+        ]
+    
+    def _setup_nltk(self):
+        """Download required NLTK resources"""
+        resources = ['punkt', 'wordnet', 'averaged_perceptron_tagger', 'omw-1.4']
+        for resource in resources:
             try:
-                nltk.data.find(f'tokenizers/{package}' if package == 'punkt' else f'corpora/{package}')
+                nltk.data.find(f'tokenizers/{resource}')
             except LookupError:
                 try:
-                    nltk.download(package, quiet=True)
-                except:
-                    logger.warning(f"Could not download {package}")
-    except Exception as e:
-        logger.warning(f"NLTK data download issue: {e}")
-
-# Try to download NLTK data
-download_nltk_data()
-
-
-@dataclass
-class TransformationConfig:
-    """Configuration for humanization intensity levels"""
-    perplexity_target: float
-    burstiness_variance: float
-    semantic_shift_tolerance: float
-    structure_variation_rate: float
-    contraction_rate: float
-    professional_voice_rate: float
+                    nltk.data.find(f'corpora/{resource}')
+                except LookupError:
+                    try:
+                        nltk.data.find(f'taggers/{resource}')
+                    except LookupError:
+                        try:
+                            nltk.download(resource, quiet=True)
+                        except:
+                            pass
     
-    @classmethod
-    def get_config(cls, level: str):
-        configs = {
-            'subtle': cls(1.2, 0.3, 0.1, 0.2, 0.5, 0.2),
-            'moderate': cls(1.5, 0.5, 0.2, 0.4, 0.7, 0.4),
-            'aggressive': cls(2.0, 0.7, 0.3, 0.6, 0.9, 0.6),
-            'extreme': cls(2.0, 0.7, 0.3, 0.6, 0.9, 0.6)  # Added for compatibility
-        }
-        return configs.get(level, configs['moderate'])
-
-
-class AdvancedHumanizer:
-    """
-    Professional-grade text humanizer using advanced NLP techniques
-    Focuses on natural linguistic variation while preserving meaning and quality
-    """
-    
-    def __init__(self):
-        try:
-            self.stop_words = set(stopwords.words('english'))
-        except:
-            # Fallback stopwords if NLTK data not available
-            self.stop_words = {'the', 'is', 'at', 'which', 'on', 'a', 'an', 'and', 'or', 'but'}
-            logger.warning("Using fallback stopwords")
-        
-        self._initialize_transformation_databases()
-        
-    def _initialize_transformation_databases(self):
-        """Initialize sophisticated transformation databases"""
-        
-        # Professional vocabulary with context-aware replacements
-        self.contextual_replacements = {
-            'formal_to_professional': {
-                'utilize': {'default': 'use', 'technical': 'apply', 'business': 'leverage'},
-                'facilitate': {'default': 'enable', 'technical': 'streamline', 'business': 'drive'},
-                'implement': {'default': 'put in place', 'technical': 'deploy', 'business': 'execute'},
-                'optimal': {'default': 'best', 'technical': 'most efficient', 'business': 'ideal'},
-                'parameters': {'default': 'settings', 'technical': 'configurations', 'business': 'criteria'},
-                'methodology': {'default': 'approach', 'technical': 'framework', 'business': 'strategy'},
-                'commence': {'default': 'begin', 'technical': 'initiate', 'business': 'launch'},
-                'terminate': {'default': 'end', 'technical': 'conclude', 'business': 'finalize'},
-                'approximately': {'default': 'about', 'technical': 'roughly', 'business': 'around'},
-                'subsequently': {'default': 'later', 'technical': 'afterwards', 'business': 'then'},
-                'demonstrate': {'default': 'show', 'technical': 'illustrate', 'business': 'prove'},
-                'acquire': {'default': 'get', 'technical': 'obtain', 'business': 'secure'},
-                'assist': {'default': 'help', 'technical': 'support', 'business': 'aid'},
-                'require': {'default': 'need', 'technical': 'demand', 'business': 'call for'},
-                'numerous': {'default': 'many', 'technical': 'multiple', 'business': 'several'},
-            }
-        }
-        
-        # Natural transition phrases that maintain professionalism
-        self.professional_transitions = {
-            'addition': [
-                'Building on this,', 'What\'s more,', 'On top of that,', 
-                'Beyond that,', 'Along with this,', 'In addition,', 'Plus,'
-            ],
-            'contrast': [
-                'That said,', 'On the flip side,', 'In contrast,',
-                'Conversely,', 'Yet,', 'Still,', 'However,'
-            ],
-            'causation': [
-                'As a result,', 'This means', 'Consequently,',
-                'Because of this,', 'This leads to', 'Which is why', 'So'
-            ],
-            'elaboration': [
-                'Put simply,', 'In other words,', 'What this means is',
-                'To clarify,', 'Specifically,', 'More precisely,', 'Essentially,'
-            ],
-            'emphasis': [
-                'Notably,', 'Importantly,', 'Worth noting:',
-                'Key point:', 'Critically,', 'Significantly,', 'The thing is,'
-            ]
-        }
-        
-        # Natural contractions (context-aware)
-        self.smart_contractions = {
-            r'\bit is\b': "it's", r'\bdo not\b': "don't", r'\bdoes not\b': "doesn't",
-            r'\bcannot\b': "can't", r'\bwill not\b': "won't", r'\bhave not\b': "haven't",
-            r'\bhas not\b': "hasn't", r'\bhad not\b': "hadn't", r'\bwould not\b': "wouldn't",
-            r'\bshould not\b': "shouldn't", r'\bcould not\b': "couldn't",
-            r'\bthat is\b': "that's", r'\bwhat is\b': "what's", r'\bwho is\b': "who's",
-            r'\bthere is\b': "there's", r'\bthey are\b': "they're", r'\bwe are\b': "we're",
-            r'\byou are\b': "you're", r'\bI am\b': "I'm", r'\bhe is\b': "he's",
-            r'\bshe is\b': "she's", r'\blet us\b': "let's", r'\bit will\b': "it'll",
-            r'\bI will\b': "I'll", r'\byou will\b': "you'll", r'\bthey will\b': "they'll"
-        }
-        
-        # AI detection patterns to avoid/transform
-        self.ai_patterns_to_avoid = {
-            'overused_phrases': {
-                'it is important to note that': 'Keep in mind that',
-                'it is worth noting that': 'Worth mentioning:',
-                'it should be emphasized that': 'Importantly,',
-                'as previously mentioned': 'As mentioned earlier,',
-                'in today\'s world': 'Today,',
-                'in today\'s society': 'Nowadays,',
-                'plays a crucial role': 'is essential',
-                'plays a vital role': 'matters greatly',
-                'it is essential to': 'We need to',
-                'it is necessary to': 'We should',
-                'in order to': 'to',
-                'due to the fact that': 'because',
-                'at this point in time': 'now',
-                'for the purpose of': 'to',
-                'in the event that': 'if',
-                'with regard to': 'about',
-                'in relation to': 'about',
-                'on the other hand': 'but',
-                'as a matter of fact': 'in fact',
-            },
-            'repetitive_starters': [
-                r'^The\s+\w+\s+is\s+',
-                r'^This\s+\w+\s+demonstrates\s+',
-                r'^It\s+is\s+important\s+to\s+note\s+',
-                r'^In\s+conclusion,\s+',
-                r'^In\s+summary,\s+',
-                r'^To\s+summarize,\s+',
-            ]
-        }
-        
-        # Professional voice elements
-        self.professional_voice_elements = {
-            'openers': [
-                'Consider this:', 'Here\'s the key:', 'What matters most:',
-                'The critical point:', 'Start here:', 'Think about this:',
-                'Let\'s examine', 'Look at', 'Here\'s what happens:'
-            ],
-            'emphasis': [
-                'The key aspect', 'What stands out', 'The main point',
-                'What\'s crucial', 'The core issue', 'What really matters'
-            ],
-            'hedging': [
-                'tends to', 'often', 'typically', 'generally',
-                'in most cases', 'usually', 'commonly', 'frequently'
-            ]
-        }
-    
-    # BACKWARD COMPATIBILITY METHOD
-    def humanize_text(self, text: str, intensity: str = 'moderate') -> str:
+    def humanize(self, text, intensity="medium"):
         """
-        Backward compatible method for existing apps
-        Calls the main humanize() method
-        """
-        return self.humanize(text, intensity)
-    
-    def humanize(self, text: str, intensity: str = 'moderate', 
-                 preserve_technical: bool = True) -> str:
-        """
-        Main humanization function with quality preservation
+        Main humanization engine
         
         Args:
             text: Input text to humanize
-            intensity: 'subtle', 'moderate', 'aggressive', or 'extreme'
-            preserve_technical: Whether to preserve technical terms
-            
+            intensity: 'low', 'medium', 'high', or 'maximum'
+        
         Returns:
-            Humanized text maintaining professional quality
+            Humanized text
         """
-        try:
-            if not text or len(text.strip()) < 10:
-                return text
-            
-            config = TransformationConfig.get_config(intensity)
-            
-            # Split into paragraphs and process
-            paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-            
-            if not paragraphs:
-                # Handle single line text
-                paragraphs = [text.strip()]
-            
-            processed_paragraphs = []
-            
-            for i, paragraph in enumerate(paragraphs):
-                try:
-                    processed = self._process_paragraph(
-                        paragraph, config, i, len(paragraphs), preserve_technical
-                    )
-                    processed_paragraphs.append(processed)
-                except Exception as e:
-                    logger.error(f"Error processing paragraph {i}: {e}")
-                    processed_paragraphs.append(paragraph)  # Keep original on error
-            
-            # Ensure paragraph coherence
-            result = self._ensure_coherence(processed_paragraphs)
-            
-            # Quality validation
-            if self._quality_check(text, result):
-                return result
-            else:
-                logger.warning("Quality check failed, applying fallback transformation")
-                return self._fallback_humanization(text, config)
-                
-        except Exception as e:
-            logger.error(f"Humanization error: {e}")
-            # Return original text if everything fails
+        if not text or len(text.strip()) == 0:
             return text
-    
-    def _process_paragraph(self, paragraph: str, config: TransformationConfig,
-                          para_index: int, total_paras: int, 
-                          preserve_technical: bool) -> str:
-        """Process individual paragraph with multi-layer transformation"""
-        
-        try:
-            sentences = sent_tokenize(paragraph)
-        except:
-            # Fallback sentence splitting
-            sentences = [s.strip() + '.' for s in paragraph.split('.') if s.strip()]
-        
-        if not sentences:
-            return paragraph
-        
-        processed_sentences = []
-        
-        for i, sentence in enumerate(sentences):
-            # Skip very short sentences
-            if len(sentence.split()) < 3:
-                processed_sentences.append(sentence)
-                continue
-            
-            # Multi-layer transformation
-            transformed = sentence
-            original = sentence  # Backup
-            
-            try:
-                # Layer 1: Remove AI fingerprints
-                transformed = self._remove_ai_patterns(transformed)
-                
-                # Layer 2: Context-aware vocabulary enhancement
-                transformed = self._enhance_vocabulary(transformed, preserve_technical)
-                
-                # Layer 3: Structural variation
-                if random.random() < config.structure_variation_rate:
-                    transformed = self._vary_structure(transformed, i, len(sentences))
-                
-                # Layer 4: Natural contractions
-                if random.random() < config.contraction_rate:
-                    transformed = self._apply_smart_contractions(transformed)
-                
-                # Layer 5: Professional voice injection
-                if random.random() < config.professional_voice_rate:
-                    transformed = self._add_professional_voice(transformed, i, len(sentences))
-                
-                # Validate transformation
-                if self._sentence_quality_check(original, transformed):
-                    processed_sentences.append(transformed)
-                else:
-                    processed_sentences.append(original)
-                    
-            except Exception as e:
-                logger.error(f"Sentence transformation error: {e}")
-                processed_sentences.append(original)
-        
-        # Connect sentences naturally
-        return self._connect_sentences(processed_sentences, config)
-    
-    def _remove_ai_patterns(self, sentence: str) -> str:
-        """Remove common AI writing patterns"""
-        
-        # Remove overused phrases
-        for phrase, replacement in self.ai_patterns_to_avoid['overused_phrases'].items():
-            if phrase.lower() in sentence.lower():
-                sentence = re.sub(
-                    re.escape(phrase), 
-                    replacement, 
-                    sentence, 
-                    flags=re.IGNORECASE
-                )
-        
-        # Fix repetitive sentence starters
-        for pattern in self.ai_patterns_to_avoid['repetitive_starters']:
-            if re.match(pattern, sentence, re.IGNORECASE):
-                sentence = self._restructure_opening(sentence)
-        
-        return sentence
-    
-    def _restructure_opening(self, sentence: str) -> str:
-        """Restructure repetitive sentence openings"""
-        words = sentence.split()
-        
-        if not words:
-            return sentence
-        
-        # Handle "The X is..." structure
-        if sentence.lower().startswith('the ') and len(words) > 3:
-            if random.random() < 0.5:
-                return 'This ' + ' '.join(words[1:])
-            else:
-                # Try to remove "The X is" structure if it makes sense
-                if len(words) > 4 and words[2].lower() in ['is', 'are', 'was', 'were']:
-                    return ' '.join(words[3:])
-        
-        # Handle "This X demonstrates..." structure
-        if sentence.lower().startswith('this ') and 'demonstrates' in sentence.lower():
-            sentence = re.sub(r'This \w+ demonstrates that', 'This shows', sentence, flags=re.IGNORECASE)
-        
-        # Handle "It is important to note"
-        if sentence.lower().startswith('it is important'):
-            sentence = re.sub(r'It is important to note that', 'Keep in mind:', sentence, flags=re.IGNORECASE)
-        
-        return sentence
-    
-    def _enhance_vocabulary(self, sentence: str, preserve_technical: bool) -> str:
-        """Context-aware vocabulary enhancement"""
-        
-        context = self._detect_context(sentence)
-        
-        for formal_word, replacements in self.contextual_replacements['formal_to_professional'].items():
-            pattern = r'\b' + re.escape(formal_word) + r'\b'
-            if re.search(pattern, sentence, re.IGNORECASE):
-                # Choose context-appropriate replacement
-                if context in replacements:
-                    replacement = replacements[context]
-                else:
-                    replacement = replacements['default']
-                
-                sentence = re.sub(pattern, replacement, sentence, flags=re.IGNORECASE, count=1)
-        
-        # Additional synonym replacement using WordNet if available
-        if WORDNET_AVAILABLE and random.random() < 0.3:
-            try:
-                sentence = self._apply_wordnet_synonyms(sentence)
-            except:
-                pass
-        
-        return sentence
-    
-    def _apply_wordnet_synonyms(self, sentence: str) -> str:
-        """Apply WordNet-based synonym replacement"""
-        if not WORDNET_AVAILABLE:
-            return sentence
-        
-        try:
-            words = word_tokenize(sentence)
-            pos_tags = pos_tag(words)
-            
-            enhanced_words = []
-            
-            for word, pos in pos_tags:
-                # Only replace adjectives and verbs occasionally
-                if (pos.startswith('JJ') or pos.startswith('VB')) and random.random() < 0.2:
-                    synonym = self._get_contextual_synonym(word, pos)
-                    enhanced_words.append(synonym if synonym else word)
-                else:
-                    enhanced_words.append(word)
-            
-            # Reconstruct sentence
-            result = ' '.join(enhanced_words)
-            
-            # Fix spacing around punctuation
-            result = re.sub(r'\s+([.,;:!?])', r'\1', result)
-            result = re.sub(r'([.,;:!?])(\w)', r'\1 \2', result)
-            
-            return result
-        except:
-            return sentence
-    
-    def _get_contextual_synonym(self, word: str, pos: str) -> Optional[str]:
-        """Get contextual synonym using WordNet"""
-        if not WORDNET_AVAILABLE:
-            return None
-        
-        try:
-            from nltk.corpus import wordnet
-            
-            # Map POS tags to WordNet POS
-            if pos.startswith('J'):
-                wordnet_pos = wordnet.ADJ
-            elif pos.startswith('V'):
-                wordnet_pos = wordnet.VERB
-            elif pos.startswith('N'):
-                wordnet_pos = wordnet.NOUN
-            elif pos.startswith('R'):
-                wordnet_pos = wordnet.ADV
-            else:
-                return None
-            
-            synsets = wordnet.synsets(word, pos=wordnet_pos)
-            if not synsets:
-                return None
-            
-            # Get synonyms from first synset
-            lemmas = synsets[0].lemmas()
-            if len(lemmas) > 1:
-                synonyms = [l.name().replace('_', ' ') for l in lemmas 
-                           if l.name().lower() != word.lower()]
-                if synonyms:
-                    return random.choice(synonyms[:3])  # Limit to top 3
-            
-            return None
-        except:
-            return None
-    
-    def _detect_context(self, sentence: str) -> str:
-        """Detect the context of the sentence (technical, business, general)"""
-        technical_indicators = ['system', 'algorithm', 'data', 'function', 'code', 
-                               'process', 'implementation', 'configuration', 'software',
-                               'hardware', 'network', 'database', 'application']
-        business_indicators = ['strategy', 'market', 'revenue', 'customer', 
-                              'business', 'organization', 'team', 'goal', 'sales',
-                              'management', 'company', 'client', 'service']
-        
-        sentence_lower = sentence.lower()
-        
-        tech_score = sum(1 for ind in technical_indicators if ind in sentence_lower)
-        business_score = sum(1 for ind in business_indicators if ind in sentence_lower)
-        
-        if tech_score > business_score and tech_score > 0:
-            return 'technical'
-        elif business_score > tech_score and business_score > 0:
-            return 'business'
-        else:
-            return 'default'
-    
-    def _vary_structure(self, sentence: str, sent_index: int, total_sents: int) -> str:
-        """Apply structural variation while preserving meaning"""
-        
-        words = sentence.split()
-        
-        # Only vary sentences with sufficient length
-        if len(words) < 7:
-            return sentence
-        
-        try:
-            # Different strategies based on sentence position
-            if sent_index == 0:
-                return self._create_strong_opening(sentence)
-            elif sent_index == total_sents - 1:
-                return self._create_conclusion(sentence)
-            else:
-                # Try to split compound sentences
-                if random.random() < 0.4:
-                    return self._split_compound_sentence(sentence)
-        except:
-            pass
-        
-        return sentence
-    
-    def _create_strong_opening(self, sentence: str) -> str:
-        """Create engaging opening sentence"""
-        
-        # If it starts with generic words, add variety
-        if re.match(r'^(The|This|It|There)\s+', sentence, re.IGNORECASE):
-            if random.random() < 0.3:
-                openers = self.professional_voice_elements['openers']
-                opener = random.choice(openers)
-                return f"{opener} {sentence[0].lower()}{sentence[1:]}"
-        
-        return sentence
-    
-    def _create_conclusion(self, sentence: str) -> str:
-        """Create natural concluding sentence"""
-        
-        # Avoid mechanical conclusions
-        mechanical_phrases = {
-            'in conclusion': 'The bottom line:',
-            'to summarize': 'In short:',
-            'to conclude': 'Ultimately:',
-            'in summary': 'To sum up:'
-        }
-        
-        for phrase, replacement in mechanical_phrases.items():
-            if phrase in sentence.lower():
-                sentence = re.sub(phrase, replacement, sentence, flags=re.IGNORECASE)
-        
-        return sentence
-    
-    def _split_compound_sentence(self, sentence: str) -> str:
-        """Split compound sentence for variety"""
-        
-        # Look for coordinating conjunctions
-        conjunctions = {
-            ' and ': ('Also,', 'Plus,'),
-            ' but ': ('However,', 'Yet,'),
-            ' so ': ('Therefore,', 'As a result,'),
-        }
-        
-        for conj, replacements in conjunctions.items():
-            if conj in sentence.lower():
-                # Split only if both parts are substantial
-                parts = sentence.split(conj, 1)
-                if len(parts) == 2 and len(parts[0].split()) > 4 and len(parts[1].split()) > 4:
-                    connector = random.choice(replacements)
-                    return f"{parts[0].strip()}. {connector} {parts[1].strip()}"
-        
-        return sentence
-    
-    def _apply_smart_contractions(self, sentence: str) -> str:
-        """Apply contractions intelligently based on context"""
-        
-        # Don't contract in very formal contexts
-        formal_indicators = ['research', 'study', 'analysis', 'investigation', 
-                            'examination', 'assessment']
-        
-        is_formal = any(ind in sentence.lower() for ind in formal_indicators)
-        
-        # Apply contractions with reduced probability in formal text
-        probability = 0.4 if is_formal else 0.9
-        
-        if random.random() < probability:
-            for pattern, contraction in self.smart_contractions.items():
-                sentence = re.sub(pattern, contraction, sentence, flags=re.IGNORECASE)
-        
-        return sentence
-    
-    def _add_professional_voice(self, sentence: str, sent_index: int, total_sents: int) -> str:
-        """Add professional human voice"""
-        
-        # Add transitions to middle sentences
-        if sent_index > 0 and random.random() < 0.5:
-            transition_type = random.choice(list(self.professional_transitions.keys()))
-            transition = random.choice(self.professional_transitions[transition_type])
-            
-            # Don't add if sentence already starts with a transition
-            common_transitions = ['however', 'moreover', 'furthermore', 'additionally', 
-                                'therefore', 'consequently', 'thus', 'hence']
-            
-            if not any(sentence.lower().startswith(t) for t in common_transitions):
-                sentence = f"{transition} {sentence[0].lower()}{sentence[1:]}"
-        
-        return sentence
-    
-    def _connect_sentences(self, sentences: List[str], config: TransformationConfig) -> str:
-        """Connect sentences with natural flow"""
-        
-        if not sentences:
-            return ""
-        
-        result = [sentences[0]]
-        
-        for i in range(1, len(sentences)):
-            current = sentences[i]
-            
-            # Occasionally use informal connectors for natural flow
-            if random.random() < 0.25:
-                connectors = ['And', 'But', 'So', 'Yet', 'Plus']
-                # Don't add if already has one
-                if not any(current.startswith(c) for c in connectors):
-                    connector = random.choice(connectors)
-                    current = f"{connector} {current[0].lower()}{current[1:]}"
-            
-            result.append(current)
-        
-        return ' '.join(result)
-    
-    def _ensure_coherence(self, paragraphs: List[str]) -> str:
-        """Ensure overall document coherence"""
-        
-        if not paragraphs:
-            return ""
-        
-        result = [paragraphs[0]]
-        
-        for i in range(1, len(paragraphs)):
-            current_para = paragraphs[i]
-            
-            # Add transitional element to some paragraphs
-            if random.random() < 0.3 and len(paragraphs) > 2:
-                transitions = [
-                    'Moving forward,', 'Now,', 'Next,', 'Additionally,', 
-                    'Beyond this,', 'What\'s more,'
-                ]
-                transition = random.choice(transitions)
-                # Don't add if already starts with transition
-                if not current_para.split()[0].rstrip(',') in [t.rstrip(',') for t in transitions]:
-                    current_para = f"{transition} {current_para[0].lower()}{current_para[1:]}"
-            
-            result.append(current_para)
-        
-        return '\n\n'.join(result)
-    
-    def _sentence_quality_check(self, original: str, transformed: str) -> bool:
-        """Check if transformed sentence maintains quality"""
-        
-        try:
-            # Length check: shouldn't deviate too much
-            orig_len = len(original.split())
-            trans_len = len(transformed.split())
-            
-            if trans_len < max(3, orig_len * 0.5) or trans_len > orig_len * 2.5:
-                return False
-            
-            # Should have proper capitalization
-            if not transformed or not transformed[0].isupper():
-                return False
-            
-            # Should end with punctuation
-            if not transformed.rstrip().endswith(('.', '!', '?', ':', ';')):
-                return False
-            
-            # Should not have excessive repetition
-            words = transformed.lower().split()
-            if len(words) > 0:
-                unique_ratio = len(set(words)) / len(words)
-                if unique_ratio < 0.35:  # Too much repetition
-                    return False
-            
-            return True
-        except:
-            return False
-    
-    def _quality_check(self, original: str, transformed: str) -> bool:
-        """Overall quality check"""
-        
-        try:
-            # Length preservation (within reason)
-            orig_len = len(original.split())
-            trans_len = len(transformed.split())
-            
-            if trans_len < orig_len * 0.5 or trans_len > orig_len * 1.6:
-                return False
-            
-            # Ensure it's not empty or too short
-            if len(transformed.strip()) < 15:
-                return False
-            
-            # Check for basic structure
-            if not transformed[0].isupper():
-                return False
-            
-            return True
-        except:
-            return False
-    
-    def _fallback_humanization(self, text: str, config: TransformationConfig) -> str:
-        """Fallback to conservative humanization if quality check fails"""
-        
-        logger.info("Applying conservative fallback humanization")
         
         result = text
         
+        # LEVEL 1: Basic humanization (always applied)
+        result = self._remove_ai_phrases(result)
+        result = self._add_contractions(result)
+        result = self._fix_spacing(result)
+        
+        # LEVEL 2: Medium intensity
+        if intensity in ["medium", "high", "maximum"]:
+            result = self._replace_synonyms(result, ratio=0.25)
+            result = self._vary_sentence_length(result)
+            result = self._add_transition_variety(result)
+        
+        # LEVEL 3: High intensity
+        if intensity in ["high", "maximum"]:
+            result = self._replace_synonyms(result, ratio=0.40)
+            result = self._restructure_sentences(result)
+            result = self._add_natural_flow(result)
+            result = self._vary_punctuation(result)
+        
+        # LEVEL 4: Maximum intensity (nuclear option)
+        if intensity == "maximum":
+            result = self._deep_paraphrase(result)
+            result = self._add_human_quirks(result)
+            result = self._inject_personality(result)
+            result = self._final_polish(result)
+        
+        return result.strip()
+    
+    def _remove_ai_phrases(self, text):
+        """Eliminate typical AI-generated phrases"""
+        result = text
+        for phrase, replacements in self.ai_phrases.items():
+            pattern = re.compile(re.escape(phrase), re.IGNORECASE)
+            matches = pattern.findall(result)
+            for match in matches:
+                replacement = random.choice(replacements)
+                # Handle capitalization
+                if match[0].isupper() and replacement:
+                    replacement = replacement[0].upper() + replacement[1:]
+                result = pattern.sub(replacement, result, count=1)
+        
+        # Clean up double spaces
+        result = re.sub(r'\s+', ' ', result)
+        return result
+    
+    def _add_contractions(self, text):
+        """Make text conversational with contractions"""
+        result = text
+        for full, contraction in self.contractions.items():
+            # Apply with 85% probability for natural variation
+            if random.random() < 0.85:
+                pattern = re.compile(r'\b' + re.escape(full) + r'\b', re.IGNORECASE)
+                result = pattern.sub(contraction, result)
+        return result
+    
+    def _get_synonyms(self, word, pos=None):
+        """Get contextual synonyms from WordNet"""
+        synonyms = set()
+        
+        # Get all synsets for the word
+        for syn in wordnet.synsets(word):
+            # Filter by POS if provided
+            if pos and not syn.pos() == pos:
+                continue
+            
+            for lemma in syn.lemmas():
+                synonym = lemma.name().replace('_', ' ')
+                # Avoid the word itself and overly complex synonyms
+                if synonym.lower() != word.lower() and len(synonym) < 20:
+                    synonyms.add(synonym)
+        
+        return list(synonyms)[:5]  # Limit to top 5
+    
+    def _replace_synonyms(self, text, ratio=0.3):
+        """Intelligently replace words with synonyms"""
         try:
-            # Apply safe transformations only
+            sentences = sent_tokenize(text)
+            result_sentences = []
             
-            # 1. Apply contractions
-            for pattern, contraction in list(self.smart_contractions.items())[:10]:
-                if random.random() < 0.7:
-                    result = re.sub(pattern, contraction, result, flags=re.IGNORECASE)
+            for sentence in sentences:
+                words = word_tokenize(sentence)
+                tagged = pos_tag(words)
+                new_words = []
+                
+                for i, (word, pos) in enumerate(tagged):
+                    # Skip short words and punctuation
+                    if len(word) <= 3 or word in string.punctuation:
+                        new_words.append(word)
+                        continue
+                    
+                    # Replace nouns, verbs, adjectives, adverbs
+                    if pos.startswith(('NN', 'VB', 'JJ', 'RB')) and random.random() < ratio:
+                        synonyms = self._get_synonyms(word, pos[0].lower())
+                        if synonyms:
+                            new_words.append(random.choice(synonyms))
+                        else:
+                            new_words.append(word)
+                    else:
+                        new_words.append(word)
+                
+                # Reconstruct sentence
+                reconstructed = self._reconstruct_sentence(new_words, sentence)
+                result_sentences.append(reconstructed)
             
-            # 2. Replace obvious AI phrases
-            for phrase, replacement in list(self.ai_patterns_to_avoid['overused_phrases'].items())[:5]:
-                if phrase in result.lower():
-                    result = re.sub(re.escape(phrase), replacement, result, flags=re.IGNORECASE)
-            
-            # 3. Simple vocabulary replacements
-            simple_replacements = {
-                'utilize': 'use', 'facilitate': 'help', 'implement': 'set up',
-                'optimal': 'best', 'commence': 'begin', 'terminate': 'end'
-            }
-            for formal, casual in simple_replacements.items():
-                result = re.sub(r'\b' + formal + r'\b', casual, result, flags=re.IGNORECASE)
-            
-        except Exception as e:
-            logger.error(f"Fallback humanization error: {e}")
+            return ' '.join(result_sentences)
+        except:
             return text
+    
+    def _reconstruct_sentence(self, words, original):
+        """Rebuild sentence with proper punctuation and spacing"""
+        if not words:
+            return original
+        
+        result = []
+        for i, word in enumerate(words):
+            if i == 0:
+                result.append(word)
+            elif word in string.punctuation or word.startswith("'"):
+                # No space before punctuation
+                if result:
+                    result[-1] += word
+            else:
+                result.append(word)
+        
+        sentence = ' '.join(result)
+        
+        # Ensure proper capitalization
+        if sentence and sentence[0].islower():
+            sentence = sentence[0].upper() + sentence[1:]
+        
+        return sentence
+    
+    def _vary_sentence_length(self, text):
+        """Create burstiness - mix of short and long sentences"""
+        sentences = sent_tokenize(text)
+        result = []
+        i = 0
+        
+        while i < len(sentences):
+            sent_length = len(word_tokenize(sentences[i]))
+            
+            # Merge short sentences (< 8 words)
+            if sent_length < 8 and i < len(sentences) - 1 and random.random() < 0.4:
+                connectors = [", and", ", so", ", but", " –", ";"]
+                merged = sentences[i].rstrip('.!?') + random.choice(connectors) + " " + sentences[i+1].lower()
+                result.append(merged)
+                i += 2
+            # Split long sentences (> 35 words)
+            elif sent_length > 35 and random.random() < 0.5:
+                split_sentences = self._split_long_sentence(sentences[i])
+                result.extend(split_sentences)
+                i += 1
+            else:
+                result.append(sentences[i])
+                i += 1
+        
+        return ' '.join(result)
+    
+    def _split_long_sentence(self, sentence):
+        """Split overly long sentences"""
+        # Look for natural break points
+        break_points = [
+            (r',\s+and\s+', '. '),
+            (r',\s+but\s+', '. However, '),
+            (r',\s+which\s+', '. This '),
+            (r',\s+because\s+', '. That\'s because '),
+            (r'\s+and\s+', '. Also, '),
+        ]
+        
+        for pattern, replacement in break_points:
+            if re.search(pattern, sentence, re.IGNORECASE):
+                parts = re.split(pattern, sentence, maxsplit=1, flags=re.IGNORECASE)
+                if len(parts) >= 2:
+                    part1 = parts[0].strip().rstrip(',') + '.'
+                    part2 = parts[1].strip()
+                    # Capitalize first letter
+                    if part2 and part2[0].islower():
+                        part2 = part2[0].upper() + part2[1:]
+                    return [part1, part2]
+        
+        return [sentence]
+    
+    def _add_transition_variety(self, text):
+        """Vary transition words for natural flow"""
+        sentences = sent_tokenize(text)
+        
+        # Don't modify if too few sentences
+        if len(sentences) < 3:
+            return text
+        
+        # Randomly add casual starters to some sentences
+        for i in range(1, len(sentences)):
+            if random.random() < 0.15:  # 15% chance
+                sentences[i] = random.choice(self.sentence_starters) + " " + sentences[i].lower()
+        
+        return ' '.join(sentences)
+    
+    def _restructure_sentences(self, text):
+        """Restructure sentences for variety"""
+        sentences = sent_tokenize(text)
+        result = []
+        
+        for sentence in sentences:
+            if random.random() < 0.3:  # 30% chance to restructure
+                restructured = self._apply_restructuring(sentence)
+                result.append(restructured)
+            else:
+                result.append(sentence)
+        
+        return ' '.join(result)
+    
+    def _apply_restructuring(self, sentence):
+        """Apply various restructuring techniques"""
+        # Move trailing adverbs to the front
+        adverb_pattern = r'^(.*?)\s+(\w+ly)([.!?])$'
+        match = re.match(adverb_pattern, sentence)
+        if match and random.random() < 0.5:
+            main_part, adverb, punct = match.groups()
+            return f"{adverb.capitalize()}, {main_part.lower()}{punct}"
+        
+        # Move prepositional phrases
+        prep_pattern = r'^(.*?),\s+(in|on|at|for|with|by)\s+([^,]+),(.*)$'
+        match = re.match(prep_pattern, sentence, re.IGNORECASE)
+        if match and random.random() < 0.5:
+            before, prep, phrase, after = match.groups()
+            return f"{prep.capitalize()} {phrase}, {before.lower()}{after}"
+        
+        return sentence
+    
+    def _add_natural_flow(self, text):
+        """Add natural conversational elements"""
+        sentences = sent_tokenize(text)
+        
+        # Add occasional filler phrases
+        if len(sentences) > 2 and random.random() < 0.2:
+            idx = random.randint(1, len(sentences) - 1)
+            filler = random.choice(self.natural_fillers)
+            
+            # Insert at beginning or middle of sentence
+            words = sentences[idx].split()
+            if len(words) > 4:
+                insert_pos = random.randint(1, min(4, len(words) - 1))
+                words.insert(insert_pos, filler + ",")
+                sentences[idx] = ' '.join(words)
+        
+        return ' '.join(sentences)
+    
+    def _vary_punctuation(self, text):
+        """Vary punctuation for more natural feel"""
+        result = text
+        
+        # Occasionally use em dashes instead of commas
+        if random.random() < 0.2:
+            result = re.sub(r',\s+which\s+', ' – which ', result, count=1)
+            result = re.sub(r',\s+and\s+', ' – and ', result, count=1)
+        
+        # Use semicolons occasionally
+        if random.random() < 0.15:
+            result = re.sub(r'\.\s+([A-Z])', r'; \1', result, count=1)
         
         return result
     
-    def get_humanization_report(self, original_text: str, humanized_text: str) -> Dict:
-        """
-        Generate comprehensive comparison report
-        Backward compatible method name
-        """
-        return self.get_analysis_report(original_text, humanized_text)
+    def _deep_paraphrase(self, text):
+        """Aggressive paraphrasing for maximum humanization"""
+        sentences = sent_tokenize(text)
+        result = []
+        
+        for sentence in sentences:
+            # Multiple passes of synonym replacement
+            paraphrased = self._replace_synonyms(sentence, ratio=0.6)
+            
+            # Restructure
+            paraphrased = self._apply_restructuring(paraphrased)
+            
+            # Change active/passive voice indicators
+            paraphrased = self._adjust_voice(paraphrased)
+            
+            result.append(paraphrased)
+        
+        return ' '.join(result)
     
-    def get_analysis_report(self, original: str, humanized: str) -> Dict:
-        """Generate comprehensive analysis report"""
+    def _adjust_voice(self, sentence):
+        """Adjust voice patterns"""
+        # Convert some passive to active (simplified)
+        passive_patterns = [
+            (r'is\s+(\w+ed)\s+by', r'gets \1 by'),
+            (r'was\s+(\w+ed)\s+by', r'got \1 by'),
+            (r'are\s+(\w+ed)\s+by', r'get \1 by'),
+        ]
         
-        def analyze_text(text):
-            try:
-                sentences = sent_tokenize(text)
-            except:
-                sentences = [s.strip() for s in text.split('.') if s.strip()]
-            
-            try:
-                words = word_tokenize(text)
-            except:
-                words = text.split()
-            
-            word_count = len(words)
-            sentence_count = len(sentences) if sentences else 1
-            
-            return {
-                'word_count': word_count,
-                'sentence_count': sentence_count,
-                'avg_sentence_length': word_count / sentence_count if sentence_count > 0 else 0,
-                'unique_words': len(set(w.lower() for w in words)),
-                'lexical_diversity': len(set(w.lower() for w in words)) / word_count if word_count > 0 else 0,
-                'contractions': len(re.findall(r"\w+'\w+", text)),
-                'questions': len(re.findall(r'\?', text)),
-                'character_count': len(text)
-            }
+        for pattern, replacement in passive_patterns:
+            if random.random() < 0.4:
+                sentence = re.sub(pattern, replacement, sentence)
         
-        try:
-            original_stats = analyze_text(original)
-            humanized_stats = analyze_text(humanized)
-            
-            return {
-                'original': original_stats,
-                'humanized': humanized_stats,
-                'improvements': {
-                    'lexical_diversity_change': round(humanized_stats['lexical_diversity'] - original_stats['lexical_diversity'], 3),
-                    'sentence_variety': round(abs(humanized_stats['avg_sentence_length'] - original_stats['avg_sentence_length']), 2),
-                    'naturalness_score': round(humanized_stats['contractions'] / max(humanized_stats['sentence_count'], 1), 2),
-                    'word_count_change': humanized_stats['word_count'] - original_stats['word_count']
-                },
-                'quality_preserved': self._quality_check(original, humanized)
-            }
-        except Exception as e:
-            logger.error(f"Analysis report error: {e}")
-            return {
-                'error': str(e),
-                'original': {},
-                'humanized': {},
-                'improvements': {},
-                'quality_preserved': False
-            }
+        return sentence
+    
+    def _add_human_quirks(self, text):
+        """Add human writing quirks and imperfections"""
+        sentences = sent_tokenize(text)
+        
+        # Occasionally start with conjunctions (breaking grammar "rules")
+        if len(sentences) > 1 and random.random() < 0.2:
+            conjunctions = ["And", "But", "So", "Yet", "Or"]
+            idx = random.randint(1, len(sentences) - 1)
+            sentences[idx] = random.choice(conjunctions) + " " + sentences[idx].lower()
+        
+        # Add parenthetical asides
+        if len(sentences) > 2 and random.random() < 0.25:
+            asides = [
+                "(at least in my experience)",
+                "(in most cases)",
+                "(though this varies)",
+                "(generally speaking)",
+                "(from what I've seen)",
+                "(surprisingly enough)",
+            ]
+            idx = random.randint(0, len(sentences) - 1)
+            sentences[idx] = sentences[idx].rstrip('.!?') + " " + random.choice(asides) + "."
+        
+        return ' '.join(sentences)
+    
+    def _inject_personality(self, text):
+        """Inject subtle personality into the text"""
+        result = text
+        
+        # Add occasional emphasis
+        emphasis_words = ["really", "actually", "definitely", "absolutely", "certainly", "quite"]
+        sentences = sent_tokenize(result)
+        
+        if sentences and random.random() < 0.3:
+            idx = random.randint(0, len(sentences) - 1)
+            words = sentences[idx].split()
+            if len(words) > 4:
+                insert_pos = random.randint(1, 3)
+                words.insert(insert_pos, random.choice(emphasis_words))
+                sentences[idx] = ' '.join(words)
+        
+        result = ' '.join(sentences)
+        
+        # Occasional rhetorical questions
+        if random.random() < 0.15:
+            rhetorical = [
+                "Right?",
+                "Don't you think?",
+                "Wouldn't you agree?",
+                "Make sense?",
+            ]
+            result = result.rstrip('.') + ", " + random.choice(rhetorical)
+        
+        return result
+    
+    def _final_polish(self, text):
+        """Final touches for perfect humanization"""
+        result = text
+        
+        # Fix any double punctuation
+        result = re.sub(r'([.!?])\1+', r'\1', result)
+        
+        # Fix spacing issues
+        result = self._fix_spacing(result)
+        
+        # Ensure proper sentence endings
+        if not result.endswith(('.', '!', '?')):
+            result += '.'
+        
+        # Remove any artifacts
+        result = re.sub(r'\s+([,.])', r'\1', result)
+        result = re.sub(r'\s+', ' ', result)
+        
+        return result.strip()
+    
+    def _fix_spacing(self, text):
+        """Fix spacing and punctuation issues"""
+        # Fix spaces before punctuation
+        text = re.sub(r'\s+([.,!?;:])', r'\1', text)
+        
+        # Ensure space after punctuation
+        text = re.sub(r'([.,!?;:])([A-Za-z])', r'\1 \2', text)
+        
+        # Fix multiple spaces
+        text = re.sub(r'\s+', ' ', text)
+        
+        # Fix quotes
+        text = re.sub(r'\s+"', ' "', text)
+        text = re.sub(r'"\s+', '" ', text)
+        
+        return text.strip()
 
 
-# Alias for backward compatibility
-UltimateHumanizer = AdvancedHumanizer
-
-
-# Usage example
+# Example usage
 if __name__ == "__main__":
-    humanizer = AdvancedHumanizer()
+    humanizer = Humanizer()
     
     sample_text = """
-    The implementation of artificial intelligence in modern systems is crucial. 
-    It is important to note that these systems utilize advanced algorithms to facilitate 
-    optimal performance. Subsequently, the parameters must be configured accordingly. 
-    In conclusion, this methodology demonstrates significant improvements.
+    It is important to note that artificial intelligence has significantly transformed 
+    the way individuals interact with technology. Furthermore, it is essential to 
+    understand that these changes will continue to evolve. In today's digital age, 
+    one must adapt to these technological advancements.
     """
     
-    print("Original:")
+    print("ORIGINAL:")
     print(sample_text)
-    print("\n" + "="*80 + "\n")
+    print("\n" + "="*50 + "\n")
     
-    # Test with humanize_text (backward compatible)
-    result = humanizer.humanize_text(sample_text, intensity='moderate')
-    print("Humanized (moderate):")
-    print(result)
-    print("\n" + "="*80 + "\n")
-    
-    # Get analysis
-    report = humanizer.get_humanization_report(sample_text, result)
-    print("Analysis Report:")
-    for key, value in report.items():
-        print(f"{key}: {value}")
+    for intensity in ["low", "medium", "high", "maximum"]:
+        print(f"{intensity.upper()} INTENSITY:")
+        print(humanizer.humanize(sample_text, intensity=intensity))
+        print("\n" + "="*50 + "\n")
