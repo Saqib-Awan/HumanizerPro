@@ -92,7 +92,7 @@ class Humanizer:
                         except:
                             pass
     
-    def humanize(self, text, intensity="medium"):
+    def humanize_text(self, text, intensity="medium"):
         """
         Main humanization engine
         
