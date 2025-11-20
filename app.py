@@ -357,7 +357,7 @@ def show_text_humanizer(humanizer, analyzer):
                 
                 # Apply humanization
                 humanized_text = humanizer.humanize(original_text, tone="neutral")
-                report = humanizer.get_humanization_report(original_text, humanized_text)
+                # report = humanizer.get_humanization_report(original_text, humanized_text)
                 
                 # Display results
                 st.subheader("🎉 Humanized Text")
